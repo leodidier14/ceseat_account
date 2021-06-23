@@ -10,6 +10,9 @@ const database = new Sequelize(process.env.DB_NAME, process.env.USER_NAME, proce
         max: 5,
         min: 0,
         idle: 10000,
+    },
+    define: {
+        "timestamps": false
     }
 });
 

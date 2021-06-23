@@ -14,10 +14,10 @@ const createRestaurantValidation = (data) => {
         openingtime: Joi.string()  .min(1),
         picturelink: Joi.string()  .min(1),
         type: Joi.string()  .min(1),
-        address: Joi.string()  .min(1),
-        country: Joi.string()  .min(1),
-        city: Joi.string()  .min(1),
-        postcode: Joi.string()  .min(1)
+        address: Joi.string()  .min(1) .required(),
+        country: Joi.string()  .min(1) .required(),
+        city: Joi.string()  .min(1) .required(),
+        postcode: Joi.string()  .min(1) .required()
     });       
     return schema.validate(data)
 }
@@ -26,7 +26,6 @@ const createRestaurantValidation = (data) => {
 const updateRestaurantValidation = (data) => {
     const schema = Joi.object({ 
         accesstoken: Joi.string()  .min(1) .required(),
-        // restaurantid: Joi.string()  .min(1) .required(),
         email: Joi.string() .min(3) .required() .email(),
         name: Joi.string()  .min(1) .required(),
         phone: Joi.string()  .min(4) .required(),  

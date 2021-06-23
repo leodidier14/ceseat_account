@@ -69,8 +69,10 @@ const updateUserController = async (req, res) => {
     const { error } = updateUserValidation(req.body);
     if (error) return res.status(400).send(error.details[0].message)
 
+    console.log(req.body)
     //Check who is the user
     const userid = await verifTokenController(req.body.accesstoken)
+    console.log(userid)
     if(userid == null) return res.status(400).send("Le propriétaire n'a pas pu être identifié");
      
     //if you have newpassword or newcheckpassword, you have to be sur that you have the other one
@@ -110,27 +112,41 @@ const updateUserController = async (req, res) => {
             await User.update({usertype: req.body.usertype},{where: {id: userid}});
         }
     }
+    var dbuser = await User.findOne({ where: {id: userid}});
 
-    const dbaddress = await Address.findOne({ where: {userid: userid}});
-    //Address
-    if(dbaddress == null){
-        const address = Address.build({ 
-            userid: userid,
-            country: null,
-            city: null,
-            address: null,
-            postcode: null,
-        })
-        await address.save();
+
+    //Créer ou récupérer une adresse/////////////////////////////////////////////////////////////////////////////////////
+    var dbaddress = ""
+    if (dbuser.addressid == null) {
+            // const dbaddress = await Address.findOne({ where: {userid: userid}});
+            dbaddress = await Address.findOne({ where: {country: null, city: null, address: null, postcode : null}});
+            //Address
+            if(dbaddress == null){
+                const address = Address.build({ 
+            // userid: userid,
+                    country: null,
+                    city: null,
+                    address: null,
+                    postcode: null,
+            })
+            await address.save();
     };
 
-    if (req.body.city){await Address.update({city: req.body.city},{where: {userid: userid}});}
-    if (req.body.country){await Address.update({country: req.body.country},{where: {userid: userid}});}
-    if (req.body.postcode){await Address.update({postcode: req.body.postcode},{where: {userid: userid}});}
-    if (req.body.address){await Address.update({address: req.body.address},{where: {userid: userid}});}
+    dbaddress = await Address.findOne({ where: {country: null, city: null, address: null, postcode : null}});
+    } else {
+        dbaddress = await Address.findOne({ where: {id: dbuser.addressid}});
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    //Warning let email update at the last update position
-    //if (req.body.email){await User.update({email: req.body.email},{where: {id: userid}});}
+    if (req.body.city){await Address.update({city: req.body.city},{where: {id: dbaddress.id}});}
+    if (req.body.country){await Address.update({country: req.body.country},{where: {id: dbaddress.id}});}
+    if (req.body.postcode){await Address.update({postcode: req.body.postcode},{where: {id: dbaddress.id}});}
+    if (req.body.address){await Address.update({address: req.body.address},{where: {id: dbaddress.id}});}
+
+    await User.update({addressid: dbaddress.id},{where: {id: userid}})
+
+    // Warning let email update at the last update position
+    if (req.body.email){await User.update({email: req.body.email},{where: {id: userid}});}
     
     res.status(200).send('Modifié')
 };
@@ -145,8 +161,11 @@ const deleteUserController = async (req, res) => {
     //Check who is the user
     const userid = await verifTokenController(req.body.accesstoken)
     if(userid == null) return res.status(400).send("Le propriétaire n'a pas pu être identifié");
+
+    var dbuser = await User.findOne({ where: {id: userid}});
  
     const deleteUser = await User.destroy({where: {id: userid}});
+    const deleteAddress = await Address.destroy({where: {id: dbuser.addressid}});
 
     res.status(200).send('Supprimé')
 };
@@ -166,8 +185,10 @@ const infoUserController = async (req, res) => {
     const dbuser = await User.findOne({ where: {id: userid} });
     if (!dbuser) return res.status(400).send("Aucune informations sur l'utilisateur"); 
 
+    // var dbuser = await User.findOne({ where: {id: userid}});
+
     //Checking if the email exists 
-    const dbaddress = await Address.findOne({ where: {userid: userid} });
+    const dbaddress = await Address.findOne({ where: {id: dbuser.addressid} });
 
     var resMessage = ""
 

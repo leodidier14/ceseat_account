@@ -18,7 +18,7 @@ const {createRestaurantValidation, updateRestaurantValidation, deleteRestaurantV
 //Load token controller
 const {verifTokenController} = require('../controllers/tokenController')
 
-//Register restaurant
+//Register restaurant OK
 const createRestaurantController = async (req, res) =>{
     
     //Check if data format is OK
@@ -32,13 +32,13 @@ const createRestaurantController = async (req, res) =>{
     //Check who is the user
     const userid = await verifTokenController(req.body.accesstoken)
     if(userid == null) return res.status(400).send("Le propriétaire n'a pas pu être identifié");
-    // console.log(userid)
+
     const dbusertype = await User.findOne({ where: {id: userid} });
     if(dbusertype.usertype == "deliveryman") return res.status(400).send("Vous êtes déjà livreur !");
     
-    // console.log('user = ' + userid)
     //Create a new restaurant
     var dbrestaurant = await Restaurant.findOne({ where: {userid: userid}});
+
     if(dbrestaurant != null) return res.status(400).send("L'utilisateur a déjà un restaurant");
     if(dbrestaurant == null){
         const restaurant = Restaurant.build({
@@ -52,35 +52,75 @@ const createRestaurantController = async (req, res) =>{
     }
     
     dbrestaurant = await Restaurant.findOne({ where: {userid: userid}});
-    console.log(dbrestaurant.id)
-    if (req.body.description){await Restaurant.update({description: req.body.description},{where: {email: req.body.email}});}
-    if (req.body.website){await Restaurant.update({website: req.body.website},{where: {email: req.body.email}});}
-    if (req.body.openingtime){await Restaurant.update({openingtime: req.body.openingtime},{where: {email: req.body.email}});}
-    if (req.body.picturelink){await Restaurant.update({picturelink: req.body.picturelink},{where: {email: req.body.email}});}
-    if (req.body.type){await Restaurant.update({type: req.body.type},{where: {email: req.body.email}});}
+    try {
+        await User.update({idrestaurant: dbrestaurant.id},{where: {id: userid}})
+    } catch (error) {
+        res.status(400).send(`idrestaurant n'a pas pu être mise dans l'utilisateur`)
+    }
+    
+    if (req.body.description){await Restaurant.update({description: req.body.description},{where: {id: dbrestaurant.id}});}
+    if (req.body.website){await Restaurant.update({website: req.body.website},{where: {id: dbrestaurant.id}});}
+    if (req.body.openingtime){await Restaurant.update({openingtime: req.body.openingtime},{where: {id: dbrestaurant.id}});}
+    if (req.body.picturelink){await Restaurant.update({picturelink: req.body.picturelink},{where: {id: dbrestaurant.id}});}
+    if (req.body.type){await Restaurant.update({type: req.body.type},{where: {id: dbrestaurant.id}});}
 
-    if (req.body.address || req.body.city || req.body.country || req.body.postcode ){
+    
+
+        adAddress = ""
+        try {
+            adAddress = req.body.address
+        } catch (error) {
+            adAddress = null
+        }
+
+        adCity = ""
+        try {
+            adCity = req.body.city
+        } catch (error) {
+            adCity = null
+        }
+
+        adCountry = ""
+        try {
+            adCountry = req.body.country
+        } catch (error) {
+            adCountry = null
+        }
+
+        adPostcode = ""
+        try {
+            adPostcode = req.body.postcode
+        } catch (error) {
+            adPostcode = null
+        }
+
         const address = Address.build({ 
-            restaurantid: dbrestaurant.id,
-            country: null,
-            city: null,
-            address: null,
-            postcode: null,
+            country: adCountry,
+            city: adCity,
+            address: adAddress,
+            postcode: adPostcode,
         })
+
         await address.save();
+    
+    
+    dbaddress = await Address.findOne({where: {country: req.body.country, city: req.body.city, address: req.body.address, postcode: req.body.postcode}})
+    
+    dbrestaurant = await Restaurant.findOne({ where: {userid: userid}});
+
+    try {
+         await Restaurant.update({addressid: dbaddress.id},{where: {userid: userid}});
+    } catch (error) {
+         console.log("erreur resto")
     }
 
-    if (req.body.city){await Address.update({city: req.body.city},{where: {restaurantid: dbrestaurant.id}});}
-    if (req.body.country){await Address.update({country: req.body.country},{where: {restaurantid: dbrestaurant.id}});}
-    if (req.body.postcode){await Address.update({postcode: req.body.postcode},{where: {restaurantid: dbrestaurant.id}});}
-    if (req.body.address){await Address.update({address: req.body.address},{where: {restaurantid: dbrestaurant.id}});}
+    dbrestaurant = await Restaurant.findOne({ where: {userid: userid}});
+    console.log(dbrestaurant)
 
-    var dbaddress = await Address.findOne({ where: {restaurantid: dbrestaurant.id}});
-    await Restaurant.update({addressid: dbaddress.id},{where: {id: dbrestaurant.id}});
-
-
+    dbaddress = await Address.findOne({ where: {id: dbrestaurant.addressid}});
+    console.log(dbaddress)
+   
     await User.update({usertype: "restaurateur"},{where: {id: userid}});
-    //Send response 
     res.status(200).send(`Restaurant créé`)
 };
 
@@ -99,7 +139,7 @@ const updateRestaurantController = async (req, res) =>{
         const dbrestaurant = await Restaurant.findOne({ where: {userid: userid} });
         if (dbrestaurant == null) return res.status(400).send("Le restaurant n'existe pas");
 
-        console.log(dbrestaurant)
+        // console.log(dbrestaurant)
 
         if (req.body.phone){await Restaurant.update({phone: req.body.phone},{where: {id: dbrestaurant.id}})}
         if (req.body.email){await Restaurant.update({email: req.body.email},{where: {id: dbrestaurant.id}})}
@@ -110,17 +150,17 @@ const updateRestaurantController = async (req, res) =>{
         if (req.body.picturelink){await Restaurant.update({picturelink: req.body.picturelink},{where: {id: dbrestaurant.id}});}
         if (req.body.type){await Restaurant.update({type: req.body.type},{where: {id: dbrestaurant.id}});}
 
-        if (req.body.city){await Address.update({city: req.body.city},{where: {restaurantid: dbrestaurant.id}});}
-        if (req.body.country){await Address.update({country: req.body.country},{where: {restaurantid: dbrestaurant.id}});}
-        if (req.body.postcode){await Address.update({postcode: req.body.postcode},{where: {restaurantid: dbrestaurant.id}});}
-        if (req.body.address){await Address.update({address: req.body.address},{where: {restaurantid: dbrestaurant.id}});}
+        if (req.body.city){await Address.update({city: req.body.city},{where: {id: dbrestaurant.addressid}});}
+        if (req.body.country){await Address.update({country: req.body.country},{where: {id: dbrestaurant.addressid}});}
+        if (req.body.postcode){await Address.update({postcode: req.body.postcode},{where: {id: dbrestaurant.addressid}});}
+        if (req.body.address){await Address.update({address: req.body.address},{where: {id: dbrestaurant.addressid}});}
             
         //Send response 
         res.status(200).send(`Restaurant modifié`)
 
 };
 
-//Delete restaurant
+//Delete restaurant OK
 const deleteRestaurantController = async (req, res) =>{
 
         //Check if data format is OK
@@ -135,15 +175,25 @@ const deleteRestaurantController = async (req, res) =>{
         const dbrestaurant = await Restaurant.findOne({ where: {userid: userid} });
         if (dbrestaurant == null) return res.status(400).send("Le restaurant n'existe pas");
     
-        await Restaurant.destroy({where: {id: dbrestaurant.id}});
-        await Address.destroy({where: {restaurantid: dbrestaurant.id}});
-
+        try {
+            await Restaurant.destroy({where: {id: dbrestaurant.id}});
+        } catch (error) {
+            console.log("Le restaurant n'existe pas dans la table")
+        }
+        
+        try {
+            await Address.destroy({where: {id: dbrestaurant.addressid}});
+        } catch (error) {
+            console.log("L'address du restaurant n'existe pas dans la table")
+        }
+        
+        await User.update({usertype: "customer"},{where: {id: userid}});
         //Send response 
         res.status(200).send(`Restaurant supprimé`)
 
 };
 
-//Info restaurant
+//Info restaurant OK
 const infoRestaurantController = async (req, res) =>{
     
     //Check if data format is OK
@@ -159,7 +209,7 @@ const infoRestaurantController = async (req, res) =>{
     if (!dbrestaurant) return res.status(400).send("Aucune informations sur l'utilisateur"); 
 
     //Checking if the email exists 
-    const dbaddress = await Address.findOne({ where: {userid: userid} });
+    const dbaddress = await Address.findOne({ where: {id: dbrestaurant.addressid} });
 
     var resMessage = ""
 
@@ -206,6 +256,7 @@ const infoRestaurantController = async (req, res) =>{
 
     res.status(200).send(resMessage)
 };
+
 
 module.exports.createRestaurantController = createRestaurantController;
 module.exports.updateRestaurantController = updateRestaurantController;

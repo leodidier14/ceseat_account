@@ -30,7 +30,7 @@ const createDeliverymanController = async (req, res) =>{
     if(userid == null) return res.status(400).send("Le propriétaire n'a pas pu être identifié");
 
     const dbuser = await User.findOne({ where: {id: userid} });
-    console.log(dbuser)
+
     if(dbuser.usertype == "restaurateur") return res.status(400).send("Vous êtes déjà restaurateur !");
 
     //Create a new restaurant
@@ -73,7 +73,7 @@ const deleteDeliverymanController = async (req, res) =>{
         if (dbdeliveryman == null) return res.status(400).send("Vous n'êtes pas livreur");
     
         await Deliveryman.destroy({where: {userid: userid}});
-
+        await User.update({usertype: "customer"},{where: {id: userid}});
         //Send response 
         res.status(200).send(`Vous n'êtes plus livreur :(`)
 };
