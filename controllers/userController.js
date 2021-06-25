@@ -1,25 +1,15 @@
 //Load required elements
-const router = require('express').Router()
 const bcrypt = require('bcryptjs')
-const path = require('path')
-const express = require('express')
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
-const jwt = require('jsonwebtoken');
 
 //Load table models
 const User = require('../models/user')
 const Address = require('../models/address')
-const Deliveryman = require('../models/deliveryman')
-const Restaurant = require('../models/restaurant')
 
 //Load validation models
 const {registerUserValidation, updateUserValidation, deleteUserValidation, infoUserValidation} = require('../validations/userValidation')
 
 //Load token controller
 const {verifTokenController} = require('../controllers/tokenController')
-
-//Use json parser
-router.use(express.json());
 
 //Register user
 const registerUserController = async (req, res) =>{ 
@@ -38,13 +28,8 @@ const registerUserController = async (req, res) =>{
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt)
 
-    //Check user type
-    if(!req.body.usertype) return res.status(400).send("Il manque le type d'utilisateur");
-
-    if(req.body.usertype != 'customer' && req.body.usertype != 'deliveryman' && req.body.usertype != 'restaurateur')
-    {
-        return res.status(400).send("Type d'utilisateur non existant");
-    }
+    var sponsorship = null
+    if(req.param("sponsorship")){sponsorship = req.param("sponsorship")}
 
     //Create a new user
     const user = User.build({ 
@@ -53,7 +38,8 @@ const registerUserController = async (req, res) =>{
         email: req.body.email,
         phone: req.body.phone,
         password: hashedPassword,
-        usertype: req.body.usertype
+        usertype: "customer",
+        sponsorship: sponsorship
     })
 
     await user.save();
@@ -69,11 +55,9 @@ const updateUserController = async (req, res) => {
     const { error } = updateUserValidation(req.body);
     if (error) return res.status(400).send(error.details[0].message)
 
-    console.log(req.body)
     //Check who is the user
     const userid = await verifTokenController(req.body.accesstoken)
-    console.log(userid)
-    if(userid == null) return res.status(400).send("Le propriétaire n'a pas pu être identifié");
+    if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
      
     //if you have newpassword or newcheckpassword, you have to be sur that you have the other one
     if(req.body.newpassword){
@@ -114,16 +98,12 @@ const updateUserController = async (req, res) => {
     }
     var dbuser = await User.findOne({ where: {id: userid}});
 
-
-    //Créer ou récupérer une adresse/////////////////////////////////////////////////////////////////////////////////////
     var dbaddress = ""
     if (dbuser.addressid == null) {
-            // const dbaddress = await Address.findOne({ where: {userid: userid}});
             dbaddress = await Address.findOne({ where: {country: null, city: null, address: null, postcode : null}});
             //Address
             if(dbaddress == null){
                 const address = Address.build({ 
-            // userid: userid,
                     country: null,
                     city: null,
                     address: null,
@@ -136,7 +116,6 @@ const updateUserController = async (req, res) => {
     } else {
         dbaddress = await Address.findOne({ where: {id: dbuser.addressid}});
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     if (req.body.city){await Address.update({city: req.body.city},{where: {id: dbaddress.id}});}
     if (req.body.country){await Address.update({country: req.body.country},{where: {id: dbaddress.id}});}
@@ -160,7 +139,7 @@ const deleteUserController = async (req, res) => {
 
     //Check who is the user
     const userid = await verifTokenController(req.body.accesstoken)
-    if(userid == null) return res.status(400).send("Le propriétaire n'a pas pu être identifié");
+    if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
 
     var dbuser = await User.findOne({ where: {id: userid}});
  
@@ -179,13 +158,11 @@ const infoUserController = async (req, res) => {
     
     //Check who is the user
     const userid = await verifTokenController(req.body.accesstoken)
-    if(userid == null) return res.status(400).send("Le propriétaire n'a pas pu être identifié");
+    if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
 
     //Get user info
     const dbuser = await User.findOne({ where: {id: userid} });
     if (!dbuser) return res.status(400).send("Aucune informations sur l'utilisateur"); 
-
-    // var dbuser = await User.findOne({ where: {id: userid}});
 
     //Checking if the email exists 
     const dbaddress = await Address.findOne({ where: {id: dbuser.addressid} });
@@ -221,7 +198,6 @@ const infoUserController = async (req, res) => {
         `
     }
     
-
     res.status(200).send(resMessage)
 };
 

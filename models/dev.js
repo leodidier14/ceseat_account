@@ -1,7 +1,7 @@
 var Sequelize = require('sequelize')
 var sequelize = require('../database')
 
-var Deliveryman = sequelize.define("Deliveryman", {
+var Dev = sequelize.define("Dev", {
     id:{
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -11,9 +11,7 @@ var Deliveryman = sequelize.define("Deliveryman", {
         type: Sequelize.INTEGER,
         foreignkey: true,
     },
-    siret: Sequelize.STRING,
-    wallet: Sequelize.DECIMAL,
-    sponsorship: Sequelize.STRING
+    siret: Sequelize.STRING
 });
 
-module.exports = Deliveryman;
+module.exports = Dev;

@@ -1,7 +1,7 @@
 var Sequelize = require('sequelize')
 var sequelize = require('../database')
 
-var User = sequelize.define("user", {
+var User = sequelize.define("User", {
     id:{
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -17,7 +17,8 @@ var User = sequelize.define("user", {
     password: Sequelize.STRING,
     phone: Sequelize.STRING,
     usertype: Sequelize.STRING,
-    refreshtoken: Sequelize.TEXT  
+    refreshtoken: Sequelize.TEXT,
+    sponsorship: Sequelize.STRING
 });
 
 module.exports = User;

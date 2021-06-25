@@ -1,7 +1,7 @@
 var Sequelize = require('sequelize')
 var sequelize = require('../database')
 
-var Restaurant = sequelize.define("restaurant", {
+var Restaurant = sequelize.define("Restaurant", {
     id:{
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -21,9 +21,11 @@ var Restaurant = sequelize.define("restaurant", {
     phone: Sequelize.STRING,
     description: Sequelize.TEXT,
     website: Sequelize.TEXT,
-    openingtime: Sequelize.TEXT,
+    openingtime: Sequelize.STRING,
+    closingtime: Sequelize.STRING,
     picturelink: Sequelize.TEXT,
-    type: Sequelize.STRING
+    type: Sequelize.STRING,
+    sponsorship : Sequelize.STRING
 });
 
 module.exports = Restaurant;

@@ -1,16 +1,6 @@
-//Load required elements
-const router = require('express').Router()
-const bcrypt = require('bcryptjs')
-const path = require('path')
-const express = require('express')
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
-const jwt = require('jsonwebtoken');
-
 //Load table models
 const User = require('../models/user')
-const Address = require('../models/address')
 const Deliveryman = require('../models/deliveryman')
-const Restaurant = require('../models/restaurant')
 
 //Load validation models
 const {createDeliverymanValidation, updateDeliverymanValidation, deleteDeliverymanValidation, infoDeliverymanValidation} = require('../validations/deliverymanValidation')
@@ -27,15 +17,20 @@ const createDeliverymanController = async (req, res) =>{
 
     //Check who is the user
     const userid = await verifTokenController(req.body.accesstoken)
-    if(userid == null) return res.status(400).send("Le propriétaire n'a pas pu être identifié");
+    if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
 
     const dbuser = await User.findOne({ where: {id: userid} });
 
     if(dbuser.usertype == "restaurateur") return res.status(400).send("Vous êtes déjà restaurateur !");
+    if(dbuser.usertype == "dev") return res.status(400).send("Vous êtes déjà développeur !");
 
     //Create a new restaurant
     var dbdeliveryman = await Deliveryman.findOne({ where: {userid: userid}});
     if(dbdeliveryman != null) return res.status(400).send("L'utilisateur est déjà livreur");
+
+    var sponsorship = null
+    if(req.param("sponsorship")){sponsorship = req.param("sponsorship")}
+
     if(dbdeliveryman == null){
         const deliveryman = Deliveryman.build({
             userid: userid,
@@ -54,7 +49,22 @@ const createDeliverymanController = async (req, res) =>{
 
 //Modify deliveryman
 const updateDeliverymanController = async (req, res) =>{
-    res.status(200).send(`Rien ne peut être modifié pour un livreur`)
+        //Check if data format is OK
+        const { error } = updateDeliverymanValidation(req.body);
+        if (error) return res.status(400).send(error.details[0].message)
+        
+        //Check who is the user
+        const userid = await verifTokenController(req.body.accesstoken)
+        if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
+        
+        // const dbuser = await User.findOne({ where: {id: userid} });
+        var dbdeliveryman = await Deliveryman.findOne({ where: {userid: userid}});
+    
+        //Change siret number
+        if (req.body.siret){await Deliveryman.update({siret: req.body.siret},{where: {id: dbdeliveryman.id}})}
+    
+        //return response
+        res.status(200).send(`Votre compte à été mis à jour`)
 };
 
 //Delete deliveryman
@@ -66,7 +76,7 @@ const deleteDeliverymanController = async (req, res) =>{
 
         //Check who is the user
         const userid = await verifTokenController(req.body.accesstoken)
-        if(userid == null) return res.status(400).send("Le propriétaire n'a pas pu être identifié");
+        if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
     
         //Checking if the restaurant is already in the database
         const dbdeliveryman = await Deliveryman.findOne({ where: {userid: userid} });
@@ -74,6 +84,7 @@ const deleteDeliverymanController = async (req, res) =>{
     
         await Deliveryman.destroy({where: {userid: userid}});
         await User.update({usertype: "customer"},{where: {id: userid}});
+        
         //Send response 
         res.status(200).send(`Vous n'êtes plus livreur :(`)
 };
@@ -87,7 +98,7 @@ const infoDeliverymanController = async (req, res) =>{
     
     //Check who is the user
     const userid = await verifTokenController(req.body.accesstoken)
-    if(userid == null) return res.status(400).send("Le propriétaire n'a pas pu être identifié");
+    if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
 
     //Get user info
     const dbdeliveryman = await Deliveryman.findOne({ where: {userid: userid} });

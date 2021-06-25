@@ -1,15 +1,6 @@
-//Load required elements
-const router = require('express').Router()
-const bcrypt = require('bcryptjs')
-const path = require('path')
-const express = require('express')
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
-const jwt = require('jsonwebtoken');
-
 //Load table models
 const User = require('../models/user')
 const Address = require('../models/address')
-const Deliveryman = require('../models/deliveryman')
 const Restaurant = require('../models/restaurant')
 
 //Load validation models
@@ -31,22 +22,28 @@ const createRestaurantController = async (req, res) =>{
 
     //Check who is the user
     const userid = await verifTokenController(req.body.accesstoken)
-    if(userid == null) return res.status(400).send("Le propriétaire n'a pas pu être identifié");
+    if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
 
     const dbusertype = await User.findOne({ where: {id: userid} });
-    if(dbusertype.usertype == "deliveryman") return res.status(400).send("Vous êtes déjà livreur !");
+    if(dbusertype.usertype == "deliveryman") return res.status(400).send("Vous êtes déjà livreur !");   
+    if(dbusertype.usertype == "dev") return res.status(400).send("Vous êtes déjà développeur !");
     
     //Create a new restaurant
     var dbrestaurant = await Restaurant.findOne({ where: {userid: userid}});
 
-    if(dbrestaurant != null) return res.status(400).send("L'utilisateur a déjà un restaurant");
+    if(dbrestaurant != null) return res.status(400).send("Vous avez déjà un restaurant");
+
+    var sponsorship = null
+    if(req.param("sponsorship")){sponsorship = req.param("sponsorship")}
+    
     if(dbrestaurant == null){
         const restaurant = Restaurant.build({
             userid: userid,
             siret: req.body.siret,
             name: req.body.name,
             email: req.body.email,
-            phone: req.body.phone
+            phone: req.body.phone,
+            sponsorship: sponsorship
         })
         await restaurant.save();
     }
@@ -55,16 +52,17 @@ const createRestaurantController = async (req, res) =>{
     try {
         await User.update({idrestaurant: dbrestaurant.id},{where: {id: userid}})
     } catch (error) {
-        res.status(400).send(`idrestaurant n'a pas pu être mise dans l'utilisateur`)
+        res.status(400).send(`Un problème est apparu lors de la creation de votre restaurant`)
     }
     
     if (req.body.description){await Restaurant.update({description: req.body.description},{where: {id: dbrestaurant.id}});}
     if (req.body.website){await Restaurant.update({website: req.body.website},{where: {id: dbrestaurant.id}});}
     if (req.body.openingtime){await Restaurant.update({openingtime: req.body.openingtime},{where: {id: dbrestaurant.id}});}
+    if (req.body.closingtime){await Restaurant.update({closingtime: req.body.closingtime},{where: {id: dbrestaurant.id}});}
     if (req.body.picturelink){await Restaurant.update({picturelink: req.body.picturelink},{where: {id: dbrestaurant.id}});}
     if (req.body.type){await Restaurant.update({type: req.body.type},{where: {id: dbrestaurant.id}});}
 
-    
+    if (req.body.sponsorship){await Restaurant.update({sponsorship: req.body.sponsorship},{where: {id: dbrestaurant.id}});}
 
         adAddress = ""
         try {
@@ -111,14 +109,11 @@ const createRestaurantController = async (req, res) =>{
     try {
          await Restaurant.update({addressid: dbaddress.id},{where: {userid: userid}});
     } catch (error) {
-         console.log("erreur resto")
     }
 
     dbrestaurant = await Restaurant.findOne({ where: {userid: userid}});
-    console.log(dbrestaurant)
 
     dbaddress = await Address.findOne({ where: {id: dbrestaurant.addressid}});
-    console.log(dbaddress)
    
     await User.update({usertype: "restaurateur"},{where: {id: userid}});
     res.status(200).send(`Restaurant créé`)
@@ -133,13 +128,11 @@ const updateRestaurantController = async (req, res) =>{
     
         //Check who is the user
         const userid = await verifTokenController(req.body.accesstoken)
-        if(userid == null) return res.status(400).send("Le propriétaire n'a pas pu être identifié");
+        if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
 
         //Checking if the restaurant is already in the database
         const dbrestaurant = await Restaurant.findOne({ where: {userid: userid} });
         if (dbrestaurant == null) return res.status(400).send("Le restaurant n'existe pas");
-
-        // console.log(dbrestaurant)
 
         if (req.body.phone){await Restaurant.update({phone: req.body.phone},{where: {id: dbrestaurant.id}})}
         if (req.body.email){await Restaurant.update({email: req.body.email},{where: {id: dbrestaurant.id}})}
@@ -147,8 +140,10 @@ const updateRestaurantController = async (req, res) =>{
         if (req.body.description){await Restaurant.update({description: req.body.description},{where: {id: dbrestaurant.id}});}
         if (req.body.website){await Restaurant.update({website: req.body.website},{where: {id: dbrestaurant.id}});}
         if (req.body.openingtime){await Restaurant.update({openingtime: req.body.openingtime},{where: {id: dbrestaurant.id}});}
+        if (req.body.closingtime){await Restaurant.update({closingtime: req.body.closingtime},{where: {id: dbrestaurant.id}});}
         if (req.body.picturelink){await Restaurant.update({picturelink: req.body.picturelink},{where: {id: dbrestaurant.id}});}
         if (req.body.type){await Restaurant.update({type: req.body.type},{where: {id: dbrestaurant.id}});}
+        if (req.body.siret){await Restaurant.update({siret: req.body.siret},{where: {id: dbrestaurant.id}})}
 
         if (req.body.city){await Address.update({city: req.body.city},{where: {id: dbrestaurant.addressid}});}
         if (req.body.country){await Address.update({country: req.body.country},{where: {id: dbrestaurant.addressid}});}
@@ -157,7 +152,6 @@ const updateRestaurantController = async (req, res) =>{
             
         //Send response 
         res.status(200).send(`Restaurant modifié`)
-
 };
 
 //Delete restaurant OK
@@ -169,25 +163,18 @@ const deleteRestaurantController = async (req, res) =>{
 
         //Check who is the user
         const userid = await verifTokenController(req.body.accesstoken)
-        if(userid == null) return res.status(400).send("Le propriétaire n'a pas pu être identifié");
+        if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
     
         //Checking if the restaurant is already in the database
         const dbrestaurant = await Restaurant.findOne({ where: {userid: userid} });
         if (dbrestaurant == null) return res.status(400).send("Le restaurant n'existe pas");
     
-        try {
-            await Restaurant.destroy({where: {id: dbrestaurant.id}});
-        } catch (error) {
-            console.log("Le restaurant n'existe pas dans la table")
-        }
+        try {await Restaurant.destroy({where: {id: dbrestaurant.id}});} catch (error) {}
         
-        try {
-            await Address.destroy({where: {id: dbrestaurant.addressid}});
-        } catch (error) {
-            console.log("L'address du restaurant n'existe pas dans la table")
-        }
+        try {await Address.destroy({where: {id: dbrestaurant.addressid}});} catch (error) {}
         
         await User.update({usertype: "customer"},{where: {id: userid}});
+
         //Send response 
         res.status(200).send(`Restaurant supprimé`)
 
@@ -202,7 +189,7 @@ const infoRestaurantController = async (req, res) =>{
     
     //Check who is the user
     const userid = await verifTokenController(req.body.accesstoken)
-    if(userid == null) return res.status(400).send("Le propriétaire n'a pas pu être identifié");
+    if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
 
     //Get user info
     const dbrestaurant = await Restaurant.findOne({ where: {userid: userid} });

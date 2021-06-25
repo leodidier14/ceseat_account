@@ -2,7 +2,7 @@
 const Joi = require('@hapi/joi')
 
 //Create restaurant
-const createDeliverymanValidation = (data) => {
+const createDevValidation = (data) => {
     const schema = Joi.object({ 
         accesstoken: Joi.string()  .min(1) .required(),
         siret: Joi.string()  .min(1) .required()      
@@ -11,7 +11,7 @@ const createDeliverymanValidation = (data) => {
 }
 
 //Update restaurant
-const updateDeliverymanValidation = (data) => {
+const updateDevValidation = (data) => {
     const schema = Joi.object({ 
         accesstoken: Joi.string()  .min(1) .required(),
         siret: Joi.string()  .min(1) .required()
@@ -19,21 +19,21 @@ const updateDeliverymanValidation = (data) => {
     return schema.validate(data)
 }
 
-const deleteDeliverymanValidation = (data) => {
+const deleteDevValidation = (data) => {
     const schema = Joi.object({ 
         accesstoken: Joi.string()  .min(1) .required()
     });       
     return schema.validate(data)
 }
 
-const infoDeliverymanValidation = (data) => {
+const infoDevValidation = (data) => {
     const schema = Joi.object({ 
         accesstoken: Joi.string()  .min(1) .required()
     });       
     return schema.validate(data)
 }
 
-module.exports.createDeliverymanValidation = createDeliverymanValidation;
-module.exports.updateDeliverymanValidation = updateDeliverymanValidation;
-module.exports.deleteDeliverymanValidation = deleteDeliverymanValidation;
-module.exports.infoDeliverymanValidation = infoDeliverymanValidation;
+module.exports.createDevValidation = createDevValidation;
+module.exports.updateDevValidation = updateDevValidation;
+module.exports.deleteDevValidation = deleteDevValidation;
+module.exports.infoDevValidation = infoDevValidation;

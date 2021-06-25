@@ -1,12 +1,11 @@
 //Load required elements
 const router = require('express').Router()
-const path = require('path')
 const express = require('express')
-require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
 
 const {registerUserController, updateUserController, deleteUserController, infoUserController} = require('../controllers/userController')
 const {createRestaurantController, updateRestaurantController, deleteRestaurantController, infoRestaurantController} = require('../controllers/restaurantController')
 const {createDeliverymanController, updateDeliverymanController, deleteDeliverymanController, infoDeliverymanController} = require('../controllers/deliverymanController')
+const {createDevController, updateDevController, deleteDevController, infoDevController} = require('../controllers/devController')
 
 //Use json parser
 router.use(express.json());
@@ -23,7 +22,9 @@ router.put('/user', function(req, res){
 });
 //Delete user OK
 router.delete('/user', function(req, res){ 
-    deleteUserController(req, res)
+    try {deleteDeliverymanController(req, res)} catch (error) {}
+    try {deleteRestaurantController(req, res)} catch (error) {}
+    try {deleteUserController(req, res)} catch (error) {}
 });
 //Info user OK
 router.get('/user', function(req, res){ 
@@ -68,6 +69,23 @@ router.get('/deliveryman', function(req, res){
     infoDeliverymanController(req, res)
 });
 
+//Dev routes
+//Create dev OK
+router.post('/dev', function(req, res){
+    createDevController(req, res)    
+});
+//Update dev OK (pas d'update)
+router.put('/dev', function(req, res){
+    updateDevController(req, res)
+});
+//Delete dev
+router.delete('/dev', function(req, res){
+    deleteDevController(req, res)
+});
+//Infos dev OK
+router.get('/dev', function(req, res){
+    infoDevController(req, res)
+});
 
 
 module.exports = router;

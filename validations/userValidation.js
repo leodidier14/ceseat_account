@@ -9,8 +9,7 @@ const registerUserValidation = (data) => {
         phone: Joi.string()  .min(4) .required(),
         email: Joi.string() .min(3) .required() .email(),
         password: Joi.string()  .min(6) .required(),
-        checkpassword: Joi.string()  .min(6) .required(), 
-        usertype: Joi.string()  .min(1) .required()
+        checkpassword: Joi.string()  .min(6) .required()
     });       
     return schema.validate(data)
 }
