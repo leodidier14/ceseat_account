@@ -21,13 +21,13 @@ router.put('/user', function(req, res){
     updateUserController(req, res)
 });
 //Delete user OK
-router.delete('/user', function(req, res){ 
+router.delete('/user/:id', function(req, res){ 
     try {deleteDeliverymanController(req, res)} catch (error) {}
     try {deleteRestaurantController(req, res)} catch (error) {}
     try {deleteUserController(req, res)} catch (error) {}
 });
 //Info user OK
-router.get('/user', function(req, res){ 
+router.get('/user/:id', function(req, res){ 
     infoUserController(req, res)
 });
 
@@ -42,11 +42,11 @@ router.put('/restaurant', function(req, res){
     updateRestaurantController(req, res)
 });
 //Delete restaurant OK
-router.delete('/restaurant', function(req, res){
+router.delete('/restaurant/:id', function(req, res){
     deleteRestaurantController(req, res)
 });
 //Infos restaurant OK
-router.get('/restaurant', function(req, res){
+router.get('/restaurant/:id', function(req, res){
     infoRestaurantController(req, res)
 });
 
@@ -61,11 +61,11 @@ router.put('/deliveryman', function(req, res){
     updateDeliverymanController(req, res)
 });
 //Delete deliveryman
-router.delete('/deliveryman', function(req, res){
+router.delete('/deliveryman/:id', function(req, res){
     deleteDeliverymanController(req, res)
 });
 //Infos deliveryman OK
-router.get('/deliveryman', function(req, res){
+router.get('/deliveryman/:id', function(req, res){
     infoDeliverymanController(req, res)
 });
 
@@ -79,11 +79,11 @@ router.put('/dev', function(req, res){
     updateDevController(req, res)
 });
 //Delete dev
-router.delete('/dev', function(req, res){
+router.delete('/dev/:id', function(req, res){
     deleteDevController(req, res)
 });
 //Infos dev OK
-router.get('/dev', function(req, res){
+router.get('/dev/:id', function(req, res){
     infoDevController(req, res)
 });
 

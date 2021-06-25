@@ -13,20 +13,20 @@ const createDeliverymanController = async (req, res) =>{
 
     //Check if data format is OK
     const { error } = createDeliverymanValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message)
+    if (error) return res.status(200).send(error.details[0].message)
 
     //Check who is the user
     const userid = await verifTokenController(req.body.accesstoken)
-    if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
+    if(userid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
 
     const dbuser = await User.findOne({ where: {id: userid} });
 
-    if(dbuser.usertype == "restaurateur") return res.status(400).send("Vous êtes déjà restaurateur !");
-    if(dbuser.usertype == "dev") return res.status(400).send("Vous êtes déjà développeur !");
+    if(dbuser.usertype == "restaurateur") return res.status(200).send("Vous êtes déjà restaurateur !");
+    if(dbuser.usertype == "dev") return res.status(200).send("Vous êtes déjà développeur !");
 
     //Create a new restaurant
     var dbdeliveryman = await Deliveryman.findOne({ where: {userid: userid}});
-    if(dbdeliveryman != null) return res.status(400).send("L'utilisateur est déjà livreur");
+    if(dbdeliveryman != null) return res.status(200).send("L'utilisateur est déjà livreur");
 
     var sponsorship = null
     if(req.param("sponsorship")){sponsorship = req.param("sponsorship")}
@@ -51,11 +51,11 @@ const createDeliverymanController = async (req, res) =>{
 const updateDeliverymanController = async (req, res) =>{
         //Check if data format is OK
         const { error } = updateDeliverymanValidation(req.body);
-        if (error) return res.status(400).send(error.details[0].message)
+        if (error) return res.status(200).send(error.details[0].message)
         
         //Check who is the user
         const userid = await verifTokenController(req.body.accesstoken)
-        if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
+        if(userid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
         
         // const dbuser = await User.findOne({ where: {id: userid} });
         var dbdeliveryman = await Deliveryman.findOne({ where: {userid: userid}});
@@ -69,18 +69,12 @@ const updateDeliverymanController = async (req, res) =>{
 
 //Delete deliveryman
 const deleteDeliverymanController = async (req, res) =>{
-    
-        //Check if data format is OK
-        const { error } = deleteDeliverymanValidation(req.body);
-        if (error) return res.status(400).send(error.details[0].message)
 
-        //Check who is the user
-        const userid = await verifTokenController(req.body.accesstoken)
-        if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
+        const userid = req.params.id
     
         //Checking if the restaurant is already in the database
         const dbdeliveryman = await Deliveryman.findOne({ where: {userid: userid} });
-        if (dbdeliveryman == null) return res.status(400).send("Vous n'êtes pas livreur");
+        if (dbdeliveryman == null) return res.status(200).send("Vous n'êtes pas livreur");
     
         await Deliveryman.destroy({where: {userid: userid}});
         await User.update({usertype: "customer"},{where: {id: userid}});
@@ -91,18 +85,11 @@ const deleteDeliverymanController = async (req, res) =>{
 
 //Info deliveryman
 const infoDeliverymanController = async (req, res) =>{
-    
-    //Check if data format is OK
-    const { error } = infoDeliverymanValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message)
-    
-    //Check who is the user
-    const userid = await verifTokenController(req.body.accesstoken)
-    if(userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
 
+    const userid = req.params.id
     //Get user info
     const dbdeliveryman = await Deliveryman.findOne({ where: {userid: userid} });
-    if (!dbdeliveryman) return res.status(400).send("Aucune informations sur l'utilisateur"); 
+    if (!dbdeliveryman) return res.status(200).send("Aucune informations sur l'utilisateur"); 
 
     //Create res message with user private infos
     var resMessage =
