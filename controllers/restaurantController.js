@@ -34,8 +34,8 @@ const createRestaurantController = async (req, res) =>{
 
     if(dbrestaurant != null) return res.status(200).send("Vous avez déjà un restaurant");
 
-    var sponsorship = null
-    if(req.param("sponsorship")){sponsorship = req.param("sponsorship")}
+    var sponsorshipLink = null
+    if(req.param("sponsorshipLink")){sponsorshipLink = req.param("sponsorshipLink")}
     
     if(dbrestaurant == null){
         const restaurant = Restaurant.build({
@@ -43,8 +43,8 @@ const createRestaurantController = async (req, res) =>{
             siret: req.body.siret,
             name: req.body.name,
             email: req.body.email,
-            phone: req.body.phone,
-            sponsorship: sponsorship
+            phoneNumber: req.body.phoneNumber,
+            sponsorshipLink: sponsorshipLink
         })
         await restaurant.save();
     }
@@ -58,12 +58,12 @@ const createRestaurantController = async (req, res) =>{
     
     if (req.body.description){await Restaurant.update({description: req.body.description},{where: {id: dbrestaurant.id}});}
     if (req.body.website){await Restaurant.update({website: req.body.website},{where: {id: dbrestaurant.id}});}
-    if (req.body.openingtime){await Restaurant.update({openingtime: req.body.openingtime},{where: {id: dbrestaurant.id}});}
-    if (req.body.closingtime){await Restaurant.update({closingtime: req.body.closingtime},{where: {id: dbrestaurant.id}});}
-    if (req.body.picturelink){await Restaurant.update({picturelink: req.body.picturelink},{where: {id: dbrestaurant.id}});}
+    if (req.body.openingTime){await Restaurant.update({openingTime: req.body.openingTime},{where: {id: dbrestaurant.id}});}
+    if (req.body.closingTime){await Restaurant.update({closingTime: req.body.closingTime},{where: {id: dbrestaurant.id}});}
+    if (req.body.pictureLink){await Restaurant.update({pictureLink: req.body.pictureLink},{where: {id: dbrestaurant.id}});}
     if (req.body.type){await Restaurant.update({type: req.body.type},{where: {id: dbrestaurant.id}});}
 
-    if (req.body.sponsorship){await Restaurant.update({sponsorship: req.body.sponsorship},{where: {id: dbrestaurant.id}});}
+    if (req.body.sponsorshipLink){await Restaurant.update({sponsorshipLink: req.body.sponsorshipLink},{where: {id: dbrestaurant.id}});}
 
         adAddress = ""
         try {
@@ -88,7 +88,7 @@ const createRestaurantController = async (req, res) =>{
 
         adPostcode = ""
         try {
-            adPostcode = req.body.postcode
+            adPostcode = req.body.zipCode
         } catch (error) {
             adPostcode = null
         }
@@ -97,13 +97,13 @@ const createRestaurantController = async (req, res) =>{
             country: adCountry,
             city: adCity,
             address: adAddress,
-            postcode: adPostcode,
+            zipCode: adPostcode,
         })
 
         await address.save();
     
     
-    dbaddress = await Address.findOne({where: {country: req.body.country, city: req.body.city, address: req.body.address, postcode: req.body.postcode}})
+    dbaddress = await Address.findOne({where: {country: req.body.country, city: req.body.city, address: req.body.address, zipCode: req.body.zipCode}})
     
     dbrestaurant = await Restaurant.findOne({ where: {userid: userid}});
 
@@ -136,20 +136,20 @@ const updateRestaurantController = async (req, res) =>{
         const dbrestaurant = await Restaurant.findOne({ where: {userid: userid} });
         if (dbrestaurant == null) return res.status(200).send("Le restaurant n'existe pas");
 
-        if (req.body.phone){await Restaurant.update({phone: req.body.phone},{where: {id: dbrestaurant.id}})}
+        if (req.body.phoneNumber){await Restaurant.update({phoneNumber: req.body.phoneNumber},{where: {id: dbrestaurant.id}})}
         if (req.body.email){await Restaurant.update({email: req.body.email},{where: {id: dbrestaurant.id}})}
         if (req.body.name){await Restaurant.update({name: req.body.name},{where: {id: dbrestaurant.id}});}
         if (req.body.description){await Restaurant.update({description: req.body.description},{where: {id: dbrestaurant.id}});}
         if (req.body.website){await Restaurant.update({website: req.body.website},{where: {id: dbrestaurant.id}});}
-        if (req.body.openingtime){await Restaurant.update({openingtime: req.body.openingtime},{where: {id: dbrestaurant.id}});}
-        if (req.body.closingtime){await Restaurant.update({closingtime: req.body.closingtime},{where: {id: dbrestaurant.id}});}
-        if (req.body.picturelink){await Restaurant.update({picturelink: req.body.picturelink},{where: {id: dbrestaurant.id}});}
+        if (req.body.openingTime){await Restaurant.update({openingTime: req.body.openingTime},{where: {id: dbrestaurant.id}});}
+        if (req.body.closingTime){await Restaurant.update({closingTime: req.body.closingTime},{where: {id: dbrestaurant.id}});}
+        if (req.body.pictureLink){await Restaurant.update({pictureLink: req.body.pictureLink},{where: {id: dbrestaurant.id}});}
         if (req.body.type){await Restaurant.update({type: req.body.type},{where: {id: dbrestaurant.id}});}
         if (req.body.siret){await Restaurant.update({siret: req.body.siret},{where: {id: dbrestaurant.id}})}
 
         if (req.body.city){await Address.update({city: req.body.city},{where: {id: dbrestaurant.addressid}});}
         if (req.body.country){await Address.update({country: req.body.country},{where: {id: dbrestaurant.addressid}});}
-        if (req.body.postcode){await Address.update({postcode: req.body.postcode},{where: {id: dbrestaurant.addressid}});}
+        if (req.body.zipCode){await Address.update({zipCode: req.body.zipCode},{where: {id: dbrestaurant.addressid}});}
         if (req.body.address){await Address.update({address: req.body.address},{where: {id: dbrestaurant.addressid}});}
             
         //Send response 
@@ -200,11 +200,12 @@ const infoRestaurantController = async (req, res) =>{
             "name": "${dbrestaurant.dataValues.name}",
             "siret": "${dbrestaurant.dataValues.siret}",
             "email": "${dbrestaurant.dataValues.email}",
-            "phone": "${dbrestaurant.dataValues.phone}",
+            "phoneNumber": "${dbrestaurant.dataValues.phoneNumber}",
             "description": "${dbrestaurant.dataValues.description}",
             "website": "${dbrestaurant.dataValues.website}",
-            "openingtime": "${dbrestaurant.dataValues.openingtime}",
-            "picturelink": "${dbrestaurant.dataValues.picturelink}",
+            "openingTime": "${dbrestaurant.dataValues.openingTime}",
+            "closingTime": "${dbrestaurant.dataValues.closingTime}",
+            "pictureLink": "${dbrestaurant.dataValues.pictureLink}",
             "type": "${dbrestaurant.dataValues.type}"
         }
         `
@@ -217,15 +218,16 @@ const infoRestaurantController = async (req, res) =>{
             "name": "${dbrestaurant.dataValues.name}",
             "siret": "${dbrestaurant.dataValues.siret}",
             "email": "${dbrestaurant.dataValues.email}",
-            "phone": "${dbrestaurant.dataValues.phone}",
+            "phoneNumber": "${dbrestaurant.dataValues.phoneNumber}",
             "description": "${dbrestaurant.dataValues.description}",
             "website": "${dbrestaurant.dataValues.website}",
-            "openingtime": "${dbrestaurant.dataValues.openingtime}",
-            "picturelink": "${dbrestaurant.dataValues.picturelink}",
+            "openingTime": "${dbrestaurant.dataValues.openingTime}",
+            "closingTime": "${dbrestaurant.dataValues.closingTime}",
+            "pictureLink": "${dbrestaurant.dataValues.pictureLink}",
             "type": "${dbrestaurant.dataValues.type}",
 
             "address": "${dbaddress.dataValues.address}",
-            "postalcode": "${dbaddress.dataValues.postcode}",
+            "zipCode": "${dbaddress.dataValues.zipCode}",
             "city": "${dbaddress.dataValues.city}",
             "country": "${dbaddress.dataValues.country}"
         }

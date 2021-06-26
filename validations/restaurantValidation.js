@@ -7,17 +7,18 @@ const createRestaurantValidation = (data) => {
         siret: Joi.string()  .min(1) .required(),
         email: Joi.string() .min(3) .required() .email(),
         name: Joi.string()  .min(1) .required(),
-        phone: Joi.string()  .min(4) .required(),  
+        phoneNumber: Joi.string()  .min(4) .required(),  
         description: Joi.string()  .min(1) .required(),
         website: Joi.string()  .min(1), 
-        openingtime: Joi.string()  .min(1) .required(),
-        closingtime : Joi.string()  .min(1) .required(),
-        picturelink: Joi.string()  .min(1) .required(),
+        openingTime: Joi.string()  .min(1) .required(),
+        closingTime : Joi.string()  .min(1) .required(),
+        pictureLink: Joi.string()  .min(1) .required(),
         type: Joi.string()  .min(1) .required(),
         address: Joi.string()  .min(1) .required(),
         country: Joi.string()  .min(1) .required(),
         city: Joi.string()  .min(1) .required(),
-        postcode: Joi.string()  .min(1) .required()
+        zipCode: Joi.string()  .min(1) .required(),
+        sponsorshipLink : Joi.string()  .min(1)
     });       
     return schema.validate(data)
 }
@@ -28,17 +29,17 @@ const updateRestaurantValidation = (data) => {
         siret: Joi.string()  .min(1) .required(),
         email: Joi.string() .min(3) .required() .email(),
         name: Joi.string()  .min(1) .required(),
-        phone: Joi.string()  .min(4) .required(),  
-        description: Joi.string()  .min(1),
+        phoneNumber: Joi.string()  .min(4) .required(),  
+        description: Joi.string()  .min(1) .required(),
         website: Joi.string()  .min(1), 
-        openingtime: Joi.string()  .min(1),
-        closingtime: Joi.string()  .min(1),
-        picturelink: Joi.string()  .min(1),
-        type: Joi.string()  .min(1),
-        address: Joi.string()  .min(1),
-        country: Joi.string()  .min(1),
-        city: Joi.string()  .min(1),
-        postcode: Joi.string()  .min(1)
+        openingTime: Joi.string()  .min(1) .required(),
+        closingTime : Joi.string()  .min(1) .required(),
+        pictureLink: Joi.string()  .min(1) .required(),
+        type: Joi.string()  .min(1) .required(),
+        address: Joi.string()  .min(1) .required(),
+        country: Joi.string()  .min(1) .required(),
+        city: Joi.string()  .min(1) .required(),
+        zipCode: Joi.string()  .min(1) .required(),
     });       
     return schema.validate(data)
 }

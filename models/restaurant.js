@@ -18,14 +18,14 @@ var Restaurant = sequelize.define("Restaurant", {
     siret: Sequelize.STRING,
     email: Sequelize.STRING,
     name: Sequelize.STRING,
-    phone: Sequelize.STRING,
+    phoneNumber: Sequelize.STRING,
     description: Sequelize.TEXT,
     website: Sequelize.TEXT,
-    openingtime: Sequelize.STRING,
-    closingtime: Sequelize.STRING,
-    picturelink: Sequelize.TEXT,
+    openingTime: Sequelize.STRING,
+    closingTime: Sequelize.STRING,
+    pictureLink: Sequelize.TEXT,
     type: Sequelize.STRING,
-    sponsorship : Sequelize.STRING
+    sponsorshipLink : Sequelize.STRING
 });
 
 module.exports = Restaurant;

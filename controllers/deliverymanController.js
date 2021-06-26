@@ -29,15 +29,15 @@ const createDeliverymanController = async (req, res) =>{
     var dbdeliveryman = await Deliveryman.findOne({ where: {userid: userid}});
     if(dbdeliveryman != null) return res.status(200).send("L'utilisateur est déjà livreur");
 
-    var sponsorship = null
-    if(req.param("sponsorship")){sponsorship = req.param("sponsorship")}
+    // var sponsorshipLink = null
+    // if(req.param("sponsorshipLink")){sponsorshipLink = req.param("sponsorshipLink")}
 
     if(dbdeliveryman == null){
         const deliveryman = Deliveryman.build({
             userid: userid,
             siret: req.body.siret,
             wallet: 0,
-            sponsorship: "a générer automatiquement"
+            sponsorshipLink: req.body.sponsorshipLink
         })
         await deliveryman.save();
     }
@@ -101,7 +101,7 @@ const infoDeliverymanController = async (req, res) =>{
         {
             "siret": "${dbdeliveryman.dataValues.siret}",
             "wallet": "${dbdeliveryman.dataValues.wallet}",
-            "sponsorship": "${dbdeliveryman.dataValues.sponsorship}"
+            "sponsorshipLink": "${dbdeliveryman.dataValues.sponsorshipLink}"
         }
         `
     

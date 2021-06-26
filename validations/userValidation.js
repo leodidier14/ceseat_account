@@ -4,12 +4,13 @@ const Joi = require('@hapi/joi')
 //Register validation
 const registerUserValidation = (data) => {
     const schema = Joi.object({ 
-        firstname: Joi.string()  .min(1) .required(),
-        lastname: Joi.string()  .min(1) .required(),
-        phone: Joi.string()  .min(4) .required(),
+        firstName: Joi.string()  .min(1) .required(),
+        lastName: Joi.string()  .min(1) .required(),
+        phoneNumber: Joi.string()  .min(4) .required(),
         email: Joi.string() .min(3) .required() .email(),
         password: Joi.string()  .min(6) .required(),
-        checkpassword: Joi.string()  .min(6) .required()
+        confirmedPassword: Joi.string()  .min(6) .required(),
+        sponsorshipLink: Joi.string()  .min(6) 
     });       
     return schema.validate(data)
 }
@@ -17,17 +18,16 @@ const registerUserValidation = (data) => {
 //Update validation
 const updateUserValidation = (data) => {
     const schema = Joi.object({ 
-        firstname: Joi.string()  .min(1),
-        lastname: Joi.string()  .min(1),
-        phone: Joi.string()  .min(4),
+        firstName: Joi.string()  .min(1),
+        lastName: Joi.string()  .min(1),
+        phoneNumber: Joi.string()  .min(4),
         email: Joi.string() .min(3) .email(),
-        newpassword: Joi.string()  .min(6),
-        checkpassword: Joi.string()  .min(6),
+        password: Joi.string()  .min(6),
+        confirmedPassword: Joi.string()  .min(6),
         city: Joi.string()  .min(1),
         country: Joi.string()  .min(1),
-        postcode: Joi.string()  .min(1),
-        address: Joi.string()  .min(1),
-        usertype: Joi.string()  .min(1)
+        zipCode: Joi.string()  .min(1),
+        address: Joi.string()  .min(1)
     });       
     return schema.validate(data)
 }

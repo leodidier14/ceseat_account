@@ -22,24 +22,24 @@ const registerUserController = async (req, res) =>{
     const reponse = await User.findOne({ where: {email: req.body.email} });
     if (reponse != null) return res.status(200).send('L\'email est déjà utilisé !');
 
-    if (req.body.password != req.body.checkpassword ) return res.status(200).send("Les mots de passes ne sont pas identiques");
+    if (req.body.password != req.body.confirmedPassword ) return res.status(200).send("Les mots de passes ne sont pas identiques");
     
     //Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt)
 
-    var sponsorship = null
-    if(req.param("sponsorship")){sponsorship = req.param("sponsorship")}
+    // var sponsorshipLink = null
+    // if(req.param("sponsorshipLink")){sponsorshipLink = req.param("sponsorshipLink")}
 
     //Create a new user
     const user = User.build({ 
-        firstname: req.body.firstname,
-        lastname: req.body.lastname,
+        firstName: req.body.firstName,
+        lastName: req.body.lastName,
         email: req.body.email,
-        phone: req.body.phone,
+        phoneNumber: req.body.phoneNumber,
         password: hashedPassword,
-        usertype: "customer",
-        sponsorship: sponsorship
+        userType: "customer",
+        sponsorshipLink: req.body.sponsorshipLink
     })
 
     await user.save();
@@ -60,31 +60,31 @@ const updateUserController = async (req, res) => {
     const userid = await verifTokenController(accesstoken)
     if(userid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
      
-    //if you have newpassword or newcheckpassword, you have to be sur that you have the other one
-    if(req.body.newpassword){
-        if(!req.body.checkpassword){
+    //if you have password or newconfirmedPassword, you have to be sur that you have the other one
+    if(req.body.password){
+        if(!req.body.confirmedPassword){
             return res.status(200).send("Vous devez envoyer un mot de passe et le mot de passe vérifié");
         }
     }
-    if(req.body.checkpassword){
-        if(!req.body.newpassword){
+    if(req.body.confirmedPassword){
+        if(!req.body.password){
             return res.status(200).send("Vous devez envoyer un mot de passe et le mot de passe vérifié");
         }
     }
 
     //if you have both, you can compare it 
-    if (req.body.newpassword && req.body.checkpassword){
-        if (req.body.newpassword != req.body.checkpassword ) return res.status(200).send("Les mots de passes ne sont pas identiques");
+    if (req.body.password && req.body.confirmedPassword){
+        if (req.body.password != req.body.confirmedPassword ) return res.status(200).send("Les mots de passes ne sont pas identiques");
     }
     
     //Update user infos
-    if (req.body.firstname){await User.update({firstname: req.body.firstname},{where: {id: userid}});}
-    if (req.body.lastname){await User.update({lastname: req.body.lastname},{where: {id: userid}});}
-    if (req.body.phone){await User.update({phone: req.body.phone},{where: {id: userid}});}
-    if(req.body.newpassword){
+    if (req.body.firstName){await User.update({firstName: req.body.firstName},{where: {id: userid}});}
+    if (req.body.lastName){await User.update({lastName: req.body.lastName},{where: {id: userid}});}
+    if (req.body.phoneNumber){await User.update({phoneNumber: req.body.phoneNumber},{where: {id: userid}});}
+    if(req.body.password){
         //Hash password
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(req.body.newpassword, salt)
+        const hashedPassword = await bcrypt.hash(req.body.password, salt)
         await User.update({password: hashedPassword},{where: {id: userid}});
     }
     if (req.body.usertype){
@@ -101,26 +101,26 @@ const updateUserController = async (req, res) => {
 
     var dbaddress = ""
     if (dbuser.addressid == null) {
-            dbaddress = await Address.findOne({ where: {country: null, city: null, address: null, postcode : null}});
+            dbaddress = await Address.findOne({ where: {country: null, city: null, address: null, zipCode : null}});
             //Address
             if(dbaddress == null){
                 const address = Address.build({ 
                     country: null,
                     city: null,
                     address: null,
-                    postcode: null,
+                    zipCode: null,
             })
             await address.save();
     };
 
-    dbaddress = await Address.findOne({ where: {country: null, city: null, address: null, postcode : null}});
+    dbaddress = await Address.findOne({ where: {country: null, city: null, address: null, zipCode : null}});
     } else {
         dbaddress = await Address.findOne({ where: {id: dbuser.addressid}});
     }
 
     if (req.body.city){await Address.update({city: req.body.city},{where: {id: dbaddress.id}});}
     if (req.body.country){await Address.update({country: req.body.country},{where: {id: dbaddress.id}});}
-    if (req.body.postcode){await Address.update({postcode: req.body.postcode},{where: {id: dbaddress.id}});}
+    if (req.body.zipCode){await Address.update({zipCode: req.body.zipCode},{where: {id: dbaddress.id}});}
     if (req.body.address){await Address.update({address: req.body.address},{where: {id: dbaddress.id}});}
 
     await User.update({addressid: dbaddress.id},{where: {id: userid}})
@@ -163,10 +163,16 @@ const infoUserController = async (req, res) => {
         resMessage =  
         `
         {
-            "firstname": "${dbuser.dataValues.firstname}",
-            "lastname": "${dbuser.dataValues.lastname}",
+            "id" : "${dbuser.dataValues.id}",
+            "firstName": "${dbuser.dataValues.firstName}",
+            "lastName": "${dbuser.dataValues.lastName}",
             "email": "${dbuser.dataValues.email}",
-            "phone": "${dbuser.dataValues.phone}"
+            "phoneNumber": "${dbuser.dataValues.phoneNumber}",
+            "address": null,
+            "zipCode": null,
+            "city": null,
+            "country": null,
+            "sponsorshipLink": "${dbuser.dataValues.sponsorshipLink}"
         }
         `
     }
@@ -175,14 +181,16 @@ const infoUserController = async (req, res) => {
         resMessage =  
         `
         {
-            "firstname": "${dbuser.dataValues.firstname}",
-            "lastname": "${dbuser.dataValues.lastname}",
+            "id" : "${dbuser.dataValues.id}",
+            "firstName": "${dbuser.dataValues.firstName}",
+            "lastName": "${dbuser.dataValues.lastName}",
             "email": "${dbuser.dataValues.email}",
-            "phone": "${dbuser.dataValues.phone}",
+            "phoneNumber": "${dbuser.dataValues.phoneNumber}",
             "address": "${dbaddress.dataValues.address}",
-            "postalcode": "${dbaddress.dataValues.postcode}",
+            "zipCode": "${dbaddress.dataValues.zipCode}",
             "city": "${dbaddress.dataValues.city}",
-            "country": "${dbaddress.dataValues.country}"
+            "country": "${dbaddress.dataValues.country}",
+            "sponsorshipLink": "${dbuser.dataValues.sponsorshipLink}"
         }
         `
     }

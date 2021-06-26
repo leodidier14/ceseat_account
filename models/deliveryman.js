@@ -13,7 +13,7 @@ var Deliveryman = sequelize.define("Deliveryman", {
     },
     siret: Sequelize.STRING,
     wallet: Sequelize.DECIMAL,
-    sponsorship: Sequelize.STRING
+    sponsorshipLink: Sequelize.STRING
 });
 
 module.exports = Deliveryman;

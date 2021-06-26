@@ -10,7 +10,7 @@ var Address = sequelize.define("Address", {
     country: Sequelize.STRING,
     city: Sequelize.STRING,
     address: Sequelize.STRING,
-    postcode: Sequelize.INTEGER
+    zipCode: Sequelize.INTEGER
     
 });
 
