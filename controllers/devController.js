@@ -3,7 +3,7 @@ const User = require('../models/user')
 const Dev = require('../models/dev')
 
 //Load validation models
-const {createDevValidation, updateDevValidation, deleteDevValidation, infoDevValidation} = require('../validations/devValidation')
+const {createDevValidation, updateDevValidation} = require('../validations/devValidation')
 
 //Load token controller
 const {verifTokenController} = require('../controllers/tokenController')
@@ -16,7 +16,8 @@ const createDevController = async (req, res) =>{
     if (error) return res.status(200).send(error.details[0].message)
 
     //Check who is the user
-    const userid = await verifTokenController(req.body.accesstoken)
+    const accesstoken = req.headers['authorization'];
+    const userid = await verifTokenController(accesstoken)
     if(userid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
 
     const dbuser = await User.findOne({ where: {id: userid} });
@@ -49,7 +50,8 @@ const updateDevController = async (req, res) =>{
     if (error) return res.status(200).send(error.details[0].message)
     
     //Check who is the user
-    const userid = await verifTokenController(req.body.accesstoken)
+    const accesstoken = req.headers['authorization'];
+    const userid = await verifTokenController(accesstoken)
     if(userid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
     
     // const dbuser = await User.findOne({ where: {id: userid} });
@@ -65,7 +67,8 @@ const updateDevController = async (req, res) =>{
 //Delete dev
 const deleteDevController = async (req, res) =>{
 
-        const userid = req.params.id
+        const accesstoken = req.headers['authorization'];
+        const userid = await verifTokenController(accesstoken)
     
         //Checking if the restaurant is already in the database
         const dbdev = await Dev.findOne({ where: {userid: userid} });
@@ -84,7 +87,8 @@ const deleteDevController = async (req, res) =>{
 //Info dev
 const infoDevController = async (req, res) =>{
     
-    const userid = req.params.id
+    const accesstoken = req.headers['authorization'];
+    const userid = await verifTokenController(accesstoken)
 
     //Get user info
     const dbdev = await Dev.findOne({ where: {userid: userid} });

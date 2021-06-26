@@ -4,7 +4,6 @@ const Joi = require('@hapi/joi')
 //Create restaurant
 const createRestaurantValidation = (data) => {
     const schema = Joi.object({ 
-        accesstoken: Joi.string()  .min(1) .required(),
         siret: Joi.string()  .min(1) .required(),
         email: Joi.string() .min(3) .required() .email(),
         name: Joi.string()  .min(1) .required(),
@@ -26,7 +25,6 @@ const createRestaurantValidation = (data) => {
 //Update restaurant
 const updateRestaurantValidation = (data) => {
     const schema = Joi.object({ 
-        accesstoken: Joi.string()  .min(1) .required(),
         siret: Joi.string()  .min(1) .required(),
         email: Joi.string() .min(3) .required() .email(),
         name: Joi.string()  .min(1) .required(),
@@ -45,21 +43,5 @@ const updateRestaurantValidation = (data) => {
     return schema.validate(data)
 }
 
-const deleteRestaurantValidation = (data) => {
-    const schema = Joi.object({ 
-        accesstoken: Joi.string()  .min(1) .required()
-    });       
-    return schema.validate(data)
-}
-
-const infoRestaurantValidation = (data) => {
-    const schema = Joi.object({ 
-        accesstoken: Joi.string()  .min(1) .required()
-    });       
-    return schema.validate(data)
-}
-
 module.exports.createRestaurantValidation = createRestaurantValidation;
 module.exports.updateRestaurantValidation = updateRestaurantValidation;
-module.exports.deleteRestaurantValidation = deleteRestaurantValidation;
-module.exports.infoRestaurantValidation = infoRestaurantValidation;

@@ -3,7 +3,7 @@ const User = require('../models/user')
 const Deliveryman = require('../models/deliveryman')
 
 //Load validation models
-const {createDeliverymanValidation, updateDeliverymanValidation, deleteDeliverymanValidation, infoDeliverymanValidation} = require('../validations/deliverymanValidation')
+const {createDeliverymanValidation, updateDeliverymanValidation} = require('../validations/deliverymanValidation')
 
 //Load token controller
 const {verifTokenController} = require('../controllers/tokenController')
@@ -16,7 +16,8 @@ const createDeliverymanController = async (req, res) =>{
     if (error) return res.status(200).send(error.details[0].message)
 
     //Check who is the user
-    const userid = await verifTokenController(req.body.accesstoken)
+    const accesstoken = req.headers['authorization'];
+    const userid = await verifTokenController(accesstoken)
     if(userid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
 
     const dbuser = await User.findOne({ where: {id: userid} });
@@ -54,7 +55,8 @@ const updateDeliverymanController = async (req, res) =>{
         if (error) return res.status(200).send(error.details[0].message)
         
         //Check who is the user
-        const userid = await verifTokenController(req.body.accesstoken)
+        const accesstoken = req.headers['authorization'];
+        const userid = await verifTokenController(accesstoken)
         if(userid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
         
         // const dbuser = await User.findOne({ where: {id: userid} });
@@ -70,7 +72,8 @@ const updateDeliverymanController = async (req, res) =>{
 //Delete deliveryman
 const deleteDeliverymanController = async (req, res) =>{
 
-        const userid = req.params.id
+        const accesstoken = req.headers['authorization'];
+        const userid = await verifTokenController(accesstoken)
     
         //Checking if the restaurant is already in the database
         const dbdeliveryman = await Deliveryman.findOne({ where: {userid: userid} });
@@ -86,7 +89,8 @@ const deleteDeliverymanController = async (req, res) =>{
 //Info deliveryman
 const infoDeliverymanController = async (req, res) =>{
 
-    const userid = req.params.id
+    const accesstoken = req.headers['authorization'];
+    const userid = await verifTokenController(accesstoken)
     //Get user info
     const dbdeliveryman = await Deliveryman.findOne({ where: {userid: userid} });
     if (!dbdeliveryman) return res.status(200).send("Aucune informations sur l'utilisateur"); 

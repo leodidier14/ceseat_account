@@ -6,7 +6,7 @@ const User = require('../models/user')
 const Address = require('../models/address')
 
 //Load validation models
-const {registerUserValidation, updateUserValidation, deleteUserValidation, infoUserValidation} = require('../validations/userValidation')
+const {registerUserValidation, updateUserValidation} = require('../validations/userValidation')
 
 //Load token controller
 const {verifTokenController} = require('../controllers/tokenController')
@@ -56,7 +56,8 @@ const updateUserController = async (req, res) => {
     if (error) return res.status(200).send(error.details[0].message)
 
     //Check who is the user
-    const userid = await verifTokenController(req.body.accesstoken)
+    const accesstoken = req.headers['authorization'];
+    const userid = await verifTokenController(accesstoken)
     if(userid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
      
     //if you have newpassword or newcheckpassword, you have to be sur that you have the other one

@@ -4,7 +4,7 @@ const Address = require('../models/address')
 const Restaurant = require('../models/restaurant')
 
 //Load validation models
-const {createRestaurantValidation, updateRestaurantValidation, deleteRestaurantValidation, infoRestaurantValidation} = require('../validations/restaurantValidation')
+const {createRestaurantValidation, updateRestaurantValidation} = require('../validations/restaurantValidation')
 
 //Load token controller
 const {verifTokenController} = require('../controllers/tokenController')
@@ -21,7 +21,8 @@ const createRestaurantController = async (req, res) =>{
     if (reponse != null) return res.status(200).send('Le restaurant existe déjà !');
 
     //Check who is the user
-    const userid = await verifTokenController(req.body.accesstoken)
+    const accesstoken = req.headers['authorization'];
+    const userid = await verifTokenController(accesstoken)
     if(userid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
 
     const dbusertype = await User.findOne({ where: {id: userid} });
@@ -127,7 +128,8 @@ const updateRestaurantController = async (req, res) =>{
         if (error) return res.status(200).send(error.details[0].message)
     
         //Check who is the user
-        const userid = await verifTokenController(req.body.accesstoken)
+        const accesstoken = req.headers['authorization'];
+        const userid = await verifTokenController(accesstoken)
         if(userid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
 
         //Checking if the restaurant is already in the database
@@ -157,7 +159,8 @@ const updateRestaurantController = async (req, res) =>{
 //Delete restaurant OK
 const deleteRestaurantController = async (req, res) =>{
 
-        const userid = req.params.id
+        const accesstoken = req.headers['authorization'];
+        const userid = await verifTokenController(accesstoken)
     
         //Checking if the restaurant is already in the database
         const dbrestaurant = await Restaurant.findOne({ where: {userid: userid} });
@@ -177,7 +180,8 @@ const deleteRestaurantController = async (req, res) =>{
 //Info restaurant OK
 const infoRestaurantController = async (req, res) =>{
     
-    const userid = req.params.id
+    const accesstoken = req.headers['authorization'];
+    const userid = await verifTokenController(accesstoken)
 
     //Get user info
     const dbrestaurant = await Restaurant.findOne({ where: {userid: userid} });

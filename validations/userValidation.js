@@ -17,9 +17,6 @@ const registerUserValidation = (data) => {
 //Update validation
 const updateUserValidation = (data) => {
     const schema = Joi.object({ 
-        accesstoken: Joi.string()  .min(1) .required(),
-        //email: Joi.string() .min(3) .email(),
-        // password: Joi.string()  .min(6) .required(),
         firstname: Joi.string()  .min(1),
         lastname: Joi.string()  .min(1),
         phone: Joi.string()  .min(4),
@@ -35,23 +32,5 @@ const updateUserValidation = (data) => {
     return schema.validate(data)
 }
 
-//Delete validation
-const deleteUserValidation = (data) => {
-    const schema = Joi.object({ 
-        accesstoken: Joi.string()  .min(1) .required()
-    });       
-    return schema.validate(data)
-}
-
-//Info validation
-const infoUserValidation = (data) => {
-    const schema = Joi.object({ 
-        accesstoken: Joi.string()  .min(1) .required()
-    });       
-    return schema.validate(data)
-}
-
 module.exports.registerUserValidation = registerUserValidation;
 module.exports.updateUserValidation = updateUserValidation;
-module.exports.deleteUserValidation = deleteUserValidation;
-module.exports.infoUserValidation = infoUserValidation;
