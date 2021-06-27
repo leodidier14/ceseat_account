@@ -10,80 +10,146 @@ const {createDevController, updateDevController, deleteDevController, infoDevCon
 //Use json parser
 router.use(express.json());
 
+//Load tokenapp controller
+const {verifTokenAppController} = require('../controllers/tokenAppController')
 
 //User routes
 //Register user OK
-router.post('/user',function(req, res){ 
+router.post('/user',async function(req, res){ 
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     registerUserController(req, res)
 });
 //Modify user OK (regarder pour changer de mail)
-router.put('/user', function(req, res){
+router.put('/user', async function(req, res){
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     updateUserController(req, res)
 });
 //Delete user OK
-router.delete('/user/:id', function(req, res){ 
+router.delete('/user/:id', async function(req, res){ 
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     try {deleteDeliverymanController(req, res)} catch (error) {}
     try {deleteRestaurantController(req, res)} catch (error) {}
     try {deleteUserController(req, res)} catch (error) {}
 });
 //Info user OK
-router.get('/user/:id', function(req, res){ 
+router.get('/user/:id', async function(req, res){ 
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     infoUserController(req, res)
 });
 
 
 //Restaurant routes
 //Create restaurant OK
-router.post('/restaurant', function(req, res){
+router.post('/restaurant', async function(req, res){
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     createRestaurantController(req, res)    
 });
 //Update restaurant OK
-router.put('/restaurant', function(req, res){
+router.put('/restaurant', async function(req, res){
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     updateRestaurantController(req, res)
 });
 //Delete restaurant OK
-router.delete('/restaurant/:id', function(req, res){
+router.delete('/restaurant/:id', async function(req, res){
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     deleteRestaurantController(req, res)
 });
 //Infos restaurant OK
-router.get('/restaurant/:id', function(req, res){
+router.get('/restaurant/:id', async function(req, res){
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     infoRestaurantController(req, res)
 });
 
 
 //Deliveryman routes
 //Create deliveryman OK
-router.post('/deliveryman', function(req, res){
+router.post('/deliveryman', async function(req, res){
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     createDeliverymanController(req, res)    
 });
 //Update deliveryman OK (pas d'update)
-router.put('/deliveryman', function(req, res){
+router.put('/deliveryman', async function(req, res){
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     updateDeliverymanController(req, res)
 });
 //Delete deliveryman
-router.delete('/deliveryman/:id', function(req, res){
+router.delete('/deliveryman/:id', async function(req, res){
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     deleteDeliverymanController(req, res)
 });
 //Infos deliveryman OK
-router.get('/deliveryman/:id', function(req, res){
+router.get('/deliveryman/:id', async function(req, res){
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     infoDeliverymanController(req, res)
 });
 
 //Dev routes
 //Create dev OK
-router.post('/dev', function(req, res){
+router.post('/dev', async function(req, res){
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     createDevController(req, res)    
 });
 //Update dev OK (pas d'update)
-router.put('/dev', function(req, res){
+router.put('/dev', async function(req, res){
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     updateDevController(req, res)
 });
 //Delete dev
-router.delete('/dev/:id', function(req, res){
+router.delete('/dev/:id', async function(req, res){
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     deleteDevController(req, res)
 });
 //Infos dev OK
-router.get('/dev/:id', function(req, res){
+router.get('/dev/:id', async function(req, res){
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
     infoDevController(req, res)
 });
 
