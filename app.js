@@ -6,6 +6,9 @@ const dotenv = require('dotenv');
 //Import routes
 const authRoute = require('./routes/routes')
 
+const cors = require('cors')
+app.use(cors())
+
 //Route middlewares
 app.use('/api/account', authRoute)
 
