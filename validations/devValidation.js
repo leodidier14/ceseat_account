@@ -1,21 +1,26 @@
 //Validation
 const Joi = require('@hapi/joi')
 
-//Create restaurant
-const createDevValidation = (data) => {
+const registerDevValidation = (data) => {
     const schema = Joi.object({ 
-        siret: Joi.string()  .min(1) .required()      
+        siret: Joi.string()  .min(3) .required(),
+        email: Joi.string() .min(3) .required() .email(),
+        password: Joi.string()  .min(3) .required(),
+        confirmedPassword: Joi.string()  .min(3) .required()
     });       
     return schema.validate(data)
 }
 
-//Update restaurant
+//Update validation
 const updateDevValidation = (data) => {
     const schema = Joi.object({ 
-        siret: Joi.string()  .min(1) .required()
+        siret: Joi.string()  .min(3) .required(),
+        email: Joi.string() .min(3) .required() .email(),
+        password: Joi.string()  .min(3) .required(),
+        confirmedPassword: Joi.string()  .min(3) .required()
     });       
     return schema.validate(data)
 }
 
-module.exports.createDevValidation = createDevValidation;
+module.exports.registerDevValidation = registerDevValidation;
 module.exports.updateDevValidation = updateDevValidation;

@@ -10,6 +10,6 @@ const authRoute = require('./routes/routes')
 app.use('/api/account', authRoute)
 
 //Running server and listening on port 3000
-const PORT = 4000
+const PORT = 3002
 app.listen(PORT, () => console.log(`Serveur running on port ${PORT}`))
 

@@ -5,7 +5,7 @@ const express = require('express')
 const {registerUserController, updateUserController, deleteUserController, infoUserController} = require('../controllers/userController')
 const {createRestaurantController, updateRestaurantController, deleteRestaurantController, infoRestaurantController} = require('../controllers/restaurantController')
 const {createDeliverymanController, updateDeliverymanController, deleteDeliverymanController, infoDeliverymanController} = require('../controllers/deliverymanController')
-const {createDevController, updateDevController, deleteDevController, infoDevController} = require('../controllers/devController')
+const {registerDevController, updateDevController, deleteDevController, infoDevController} = require('../controllers/devController')
 
 //Use json parser
 router.use(express.json());
@@ -126,7 +126,7 @@ router.post('/dev', async function(req, res){
     checkTokenApp = await verifTokenAppController(tokenapp)
     if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
 
-    createDevController(req, res)    
+    registerDevController(req, res)    
 });
 //Update dev OK (pas d'update)
 router.put('/dev', async function(req, res){

@@ -102,6 +102,12 @@ const deleterestaurantValidation = (data) => {
     return schema.validate(data)
 }
 
+
+//Register validation
+
+
+
+
 module.exports.registerValidation = registerValidation;
 module.exports.updateValidation = updateValidation;
 module.exports.deleteValidation = deleteValidation;
@@ -109,3 +115,6 @@ module.exports.infoValidation = infoValidation;
 module.exports.createrestaurantValidation = createrestaurantValidation;
 module.exports.updaterestaurantValidation = updaterestaurantValidation;
 module.exports.deleterestaurantValidation = deleterestaurantValidation;
+
+// module.exports.registerDevValidation = registerDevValidation;
+// module.exports.updateDevValidation = updateDevValidation;

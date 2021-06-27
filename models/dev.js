@@ -7,11 +7,11 @@ var Dev = sequelize.define("Dev", {
         primaryKey: true,
         autoIncrement: true,
     },
-    userid:{
-        type: Sequelize.INTEGER,
-        foreignkey: true,
-    },
-    siret: Sequelize.STRING
+    siret: Sequelize.STRING,
+    email: Sequelize.STRING,
+    password: Sequelize.STRING,
+    userType: Sequelize.STRING,
+    refreshtoken: Sequelize.TEXT
 });
 
 module.exports = Dev;

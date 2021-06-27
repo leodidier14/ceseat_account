@@ -1,111 +1,131 @@
+//Load required elements
+const bcrypt = require('bcryptjs')
+
 //Load table models
-const User = require('../models/user')
 const Dev = require('../models/dev')
+const Address = require('../models/address')
 
 //Load validation models
-const {createDevValidation, updateDevValidation} = require('../validations/devValidation')
+const {registerDevValidation, updateDevValidation} = require('../validations/devValidation')
 
 //Load token controller
-const {verifTokenController} = require('../controllers/tokenController')
+const {verifTokenDevController} = require('../controllers/tokenDevController')
 
-//Create dev
-const createDevController = async (req, res) =>{
+//Register dev
+const registerDevController = async (req, res) =>{ 
 
     //Check if data format is OK
-    const { error } = createDevValidation(req.body);
+    const { error } = registerDevValidation(req.body);
     if (error) return res.status(200).send(error.details[0].message)
+   
+    //Checking if the dev is already in the database
+    const reponse = await Dev.findOne({ where: {email: req.body.email} });
+    if (reponse != null) return res.status(200).send('L\'email est déjà utilisé !');
 
-    //Check who is the user
-    const accesstoken = req.headers['authorization'];
-    const userid = await verifTokenController(accesstoken)
-    if(userid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
-
-    const dbuser = await User.findOne({ where: {id: userid} });
-
-    if(dbuser.usertype == "restaurateur") return res.status(200).send("Vous êtes déjà restaurateur !");
-    if(dbuser.usertype == "deliveryman") return res.status(200).send("Vous êtes déjà livreur !");
-
-    //Create a new restaurant
-    var dbdev = await Dev.findOne({ where: {userid: userid}});
-    if(dbdev != null) return res.status(200).send("Vous êtes déjà développeur !");
-
-    if(dbdev == null){
-        const dev = Dev.build({
-            userid: userid,
-            siret: req.body.siret
-        })
-        await dev.save();
-    }
+    if (req.body.password != req.body.confirmedPassword ) return res.status(200).send("Les mots de passes ne sont pas identiques");
     
-    await User.update({usertype: "dev"},{where: {id: userid}});
+    //Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(req.body.password, salt)
+
+    //Create a new dev
+    const dev = Dev.build({ 
+        siret : req.body.siret,
+        email: req.body.email,
+        password: hashedPassword,
+        userType: "dev"
+    })
+
+    await dev.save();
 
     //Send response 
-    res.status(200).send(`Vous êtes maintenant développeur`)
+    res.status(200).send(`Enregistré`)
 };
 
 //Modify dev
-const updateDevController = async (req, res) =>{
+const updateDevController = async (req, res) => {
+    
     //Check if data format is OK
     const { error } = updateDevValidation(req.body);
     if (error) return res.status(200).send(error.details[0].message)
-    
-    //Check who is the user
+
+    //Check who is the dev
     const accesstoken = req.headers['authorization'];
-    const userid = await verifTokenController(accesstoken)
-    if(userid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
+    const devid = await verifTokenDevController(accesstoken)
+    console.log(devid)
+    if(devid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
+     
+    //if you have password or newconfirmedPassword, you have to be sur that you have the other one
+    if(req.body.password){
+        if(!req.body.confirmedPassword){
+            return res.status(200).send("Vous devez envoyer un mot de passe et le mot de passe vérifié");
+        }
+    }
+    if(req.body.confirmedPassword){
+        if(!req.body.password){
+            return res.status(200).send("Vous devez envoyer un mot de passe et le mot de passe vérifié");
+        }
+    }
+
+    //if you have both, you can compare it 
+    if (req.body.password && req.body.confirmedPassword){
+        if (req.body.password != req.body.confirmedPassword ) return res.status(200).send("Les mots de passes ne sont pas identiques");
+    }
     
-    // const dbuser = await User.findOne({ where: {id: userid} });
-    var dbdev = await Dev.findOne({ where: {userid: userid}});
+    //Update dev infos
+    if(req.body.password){
+        //Hash password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(req.body.password, salt)
+        await Dev.update({password: hashedPassword},{where: {id: devid}});
+    }
+    if (req.body.devtype){
+        if(req.body.devtype != 'customer' && req.body.devtype != 'deliveryman' && req.body.devtype != 'restaurant')
+        {
+            return res.status(200).send("Type d'utilisateur non existant");
+        }
+        else
+        {
+            await Dev.update({devtype: req.body.devtype},{where: {id: devid}});
+        }
+    }
 
-    //Change siret number
-    if (req.body.siret){await Dev.update({siret: req.body.siret},{where: {id: dbdev.id}})}
-
-    //return response
-    res.status(200).send(`Votre compte à été mis à jour`)
+    // Warning let email update at the last update position
+    if (req.body.email){await Dev.update({email: req.body.email},{where: {id: devid}});}
+    
+    res.status(200).send('Modifié')
 };
 
-//Delete dev
-const deleteDevController = async (req, res) =>{
+//Delete dev 
+const deleteDevController = async (req, res) => { 
 
-        const accesstoken = req.headers['authorization'];
-        const userid = await verifTokenController(accesstoken)
-    
-        //Checking if the restaurant is already in the database
-        const dbdev = await Dev.findOne({ where: {userid: userid} });
-        if (dbdev == null) return res.status(200).send("Vous n'êtes pas développeur !");
-    
-        //Delete user ligne on dev table
-        await Dev.destroy({where: {userid: userid}});
+    const devid = req.params.id
 
-        //Change user role to customer
-        await User.update({usertype: "customer"},{where: {id: userid}});
+    const deleteDev = await Dev.destroy({where: {id: devid}});
 
-        //Send response 
-        res.status(200).send(`Vous n'êtes plus développeur :(`)
+    res.status(200).send('Supprimé')
 };
 
 //Info dev
-const infoDevController = async (req, res) =>{
+const infoDevController = async (req, res) => { 
     
-    const accesstoken = req.headers['authorization'];
-    const userid = await verifTokenController(accesstoken)
+    const devid = req.params.id
 
-    //Get user info
-    const dbdev = await Dev.findOne({ where: {userid: userid} });
-    if (!dbdev) return res.status(200).send("Aucune informations disponible sur votre compte développeur"); 
+    //Get dev info
+    const dbdev = await Dev.findOne({ where: {id: devid} });
+    if (!dbdev) return res.status(200).send("Aucune informations sur l'utilisateur"); 
 
-    //Create res message with user private infos
-    var resMessage =
+    var resMessage =  
         `
         {
-            "siret": "${dbdev.dataValues.siret}"
+            "siret" : "${dbdev.dataValues.siret}",
+            "email": "${dbdev.dataValues.email}"
         }
         `
-    
     res.status(200).send(resMessage)
 };
 
-module.exports.createDevController = createDevController;
+module.exports.registerDevController = registerDevController;
 module.exports.updateDevController = updateDevController;
 module.exports.deleteDevController = deleteDevController;
 module.exports.infoDevController = infoDevController;
