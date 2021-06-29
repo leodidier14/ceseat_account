@@ -205,7 +205,6 @@ const infoUserController = async (req, res) => {
 
 const getRole = async (req, res) => {
     try {
-        console.log('ici')
 
         //Check who is the user
         const accesstoken = req.headers['authorization'];
@@ -215,12 +214,19 @@ const getRole = async (req, res) => {
 
         const deliveryman = await Deliveryman.findOne({ where: { userid: userid } });
 
+
+      /*  const dev = await dev.findOne({ where: { id: userid } });*/
+        const dbtype = await User.findOne({ where: { id: userid } });
+        console.log(dbtype.dataValues.userType)
         if (restaurant) {
-            console.log(restaurant.dataValues.id)
-            res.status(200).send({ 'type': "restaurantId", "id": restaurant.dataValues.id })
+            res.status(200).send({ 'type': "restaurant", "id": restaurant.dataValues.id })
         } else if (deliveryman) {
-            console.log(deliveryman.dataValues.id)
-            res.status(200).send({ 'type': "deliverymanId", "id": restaurant.dataValues.id })
+            res.status(200).send({ 'type': "deliveryman", "id": restaurant.dataValues.id })
+        } else if (dbtype.dataValues.userType == 'businessman') {
+            console.log('businessman')
+            res.status(200).send({ 'type': "businessman", "id": 0 })
+        } else if (dbtype.dataValues.userType == 'technician') {
+            res.status(200).send({ 'type': "technician", "id": 0 })
         } else {
             console.log('client')
             res.status(200).send('client')
