@@ -22,8 +22,8 @@ const createDeliverymanController = async (req, res) => {
 
     const dbuser = await User.findOne({ where: { id: userid } });
 
-    if (dbuser.usertype == "restaurateur") return res.status(200).send("Vous êtes déjà restaurateur !");
-    if (dbuser.usertype == "dev") return res.status(200).send("Vous êtes déjà développeur !");
+    if (dbuser.userType == "restaurateur") return res.status(200).send("Vous êtes déjà restaurateur !");
+    if (dbuser.userType == "dev") return res.status(200).send("Vous êtes déjà développeur !");
 
     //Create a new restaurant
     var dbdeliveryman = await Deliveryman.findOne({ where: { userid: userid } });

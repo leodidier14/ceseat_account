@@ -18,9 +18,8 @@ const createRestaurantValidation = (data) => {
         country: Joi.string().min(1).required(),
         city: Joi.string().min(1).required(),
         zipCode: Joi.string().min(1).required(),
-        sponsorshipLink: Joi.string().min(1),
-        openTime: Joi.string().min(1).required(),
-        closeTime: Joi.string().min(1).required(),
+        sponsorshipLink: Joi.string().allow(null).allow('').optional(),
+        id: Joi.number()
     });
     return schema.validate(data)
 }
@@ -42,6 +41,7 @@ const updateRestaurantValidation = (data) => {
         country: Joi.string().min(1).required(),
         city: Joi.string().min(1).required(),
         zipCode: Joi.string().min(1).required(),
+        id: Joi.number()
     });
     return schema.validate(data)
 }

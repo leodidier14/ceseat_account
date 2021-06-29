@@ -113,7 +113,7 @@ const createRestaurantController = async (req, res) => {
 
     dbrestaurant = await Restaurant.findOne({ where: { userid: userid } });
 
-    await User.update({ usertype: "restaurateur" }, { where: { id: userid } });
+    await User.update({ userType: "restaurateur" }, { where: { id: userid } });
     res.status(200).send(dbrestaurant)
 };
 
