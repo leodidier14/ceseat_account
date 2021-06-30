@@ -238,6 +238,41 @@ const getRole = async (req, res) => {
     }
 }
 
+const getAllUsers = async (req, res) =>{    
+    try {
+        const dbusers = await User.find();
+        res.status(200).send(dbusers);
+    } catch (error) {
+        res.status(400).send("users cannot be find");
+    }
+    
+}
+module.exports.getAllUsers = getAllUsers;
+
+const deleteUserFromApp = async (req, res) => {
+    const userid = req.params.id
+    try {
+        const user = await User.find({id: userid});
+        res.status(200).send("user deleted");
+    } catch (error) {
+        res.status(400).send("user cannot be deleted");
+    }
+}
+module.exports.deleteUserFromApp = deleteUserFromApp;
+
+
+const changeUserRole = async (req, res) => {
+    const userid = req.body.id
+    try {
+        await User.update({ userType: req.body.userType }, { where: { id: userid } });
+        res.status(200).send("role changed");
+    } catch (error) {
+        res.status(400).send("role cannot be changed");
+    }
+    
+}
+module.exports.changeUserRole = changeUserRole;
+
 module.exports.registerUserController = registerUserController;
 module.exports.updateUserController = updateUserController;
 module.exports.deleteUserController = deleteUserController;

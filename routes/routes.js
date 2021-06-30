@@ -6,12 +6,38 @@ const { registerUserController, updateUserController, deleteUserController, info
 const { createRestaurantController, updateRestaurantController, deleteRestaurantController, infoRestaurantController } = require('../controllers/restaurantController')
 const { createDeliverymanController, updateDeliverymanController, deleteDeliverymanController, infoDeliverymanController } = require('../controllers/deliverymanController')
 const { registerDevController, updateDevController, deleteDevController, infoDevController } = require('../controllers/devController')
+const { getAllUsers, deleteUserFromApp, changeUserRole } = require('../controllers/userController')
 
 //Use json parser
 router.use(express.json());
 
 //Load tokenapp controller
 const { verifTokenAppController } = require('../controllers/tokenAppController')
+
+router.get('/app/user', async function (req, res) {
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
+    getAllUsers(req, res)
+});
+
+router.delete('/app/user/:id', async function (req, res) {
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
+    deleteUserFromApp(req, res)
+});
+
+router.put('/app/user', async function (req, res) {
+    const tokenapp = req.headers['tokenapp'];
+    checkTokenApp = await verifTokenAppController(tokenapp)
+    if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
+
+    changeUserRole(req, res)
+});
+
 
 router.get('/available', function(req, res) {
     console.log('ask for availableity')
