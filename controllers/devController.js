@@ -111,7 +111,8 @@ const infoDevController = async (req, res) => {
         `
         {
             "companyName" : "${dbdev.dataValues.companyName}",
-            "email": "${dbdev.dataValues.email}"
+            "email": "${dbdev.dataValues.email}",
+            "sponsorshipLink": "SPLDEV21${devid}"
         }
         `
     res.status(200).send(resMessage)
