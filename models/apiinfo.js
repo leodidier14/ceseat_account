@@ -3,6 +3,7 @@ const { Schema } = mongoose;
 
 const apiinfo = new Schema({
     name : String,
+    port: String,
     version : String
 });
 
