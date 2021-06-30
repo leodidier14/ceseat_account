@@ -4,6 +4,7 @@ const { Schema } = mongoose;
 const apiinfo = new Schema({
     name : String,
     port: String,
+    path: String,
     version : String
 });
 

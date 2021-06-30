@@ -13,6 +13,11 @@ router.use(express.json());
 //Load tokenapp controller
 const { verifTokenAppController } = require('../controllers/tokenAppController')
 
+router.get('/available', function(req, res) {
+    console.log('ask for availableity')
+    res.send(true)
+  });
+
 //User routes
 //Register user OK
 router.post('/user', async function (req, res) {
