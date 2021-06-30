@@ -19,13 +19,13 @@ const registerUserController = async (req, res) => {
 
     //Check if data format is OK
     const { error } = registerUserValidation(req.body);
-    if (error) return res.status(200).send(error.details[0].message)
+    if (error) return res.status(400).send(error.details[0].message)
 
     //Checking if the user is already in the database
     const reponse = await User.findOne({ where: { email: req.body.email } });
-    if (reponse != null) return res.status(200).send('L\'email est déjà utilisé !');
+    if (reponse != null) return res.status(400).send('L\'email est déjà utilisé !');
 
-    if (req.body.password != req.body.confirmedPassword) return res.status(200).send("Les mots de passes ne sont pas identiques");
+    if (req.body.password != req.body.confirmedPassword) return res.status(400).send("Les mots de passes ne sont pas identiques");
 
     //Hash password
     const salt = await bcrypt.genSalt(10);
@@ -57,29 +57,29 @@ const updateUserController = async (req, res) => {
     const { error } = updateUserValidation(req.body);
     if (error) {
         console.log(error)
-        return res.status(200).send(error.details[0].message)
+        return res.status(400).send(error.details[0].message)
     }
     //Check who is the user
     const accesstoken = req.headers['authorization'];
     const userid = await verifTokenController(accesstoken)
-    if (userid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
+    if (userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
     console.log(req.body)
 
     //if you have password or newconfirmedPassword, you have to be sur that you have the other one
     if (req.body.password) {
         if (!req.body.confirmedPassword) {
-            return res.status(200).send("Vous devez envoyer un mot de passe et le mot de passe vérifié");
+            return res.status(400).send("Vous devez envoyer un mot de passe et le mot de passe vérifié");
         }
     }
     if (req.body.confirmedPassword) {
         if (!req.body.password) {
-            return res.status(200).send("Vous devez envoyer un mot de passe et le mot de passe vérifié");
+            return res.status(400).send("Vous devez envoyer un mot de passe et le mot de passe vérifié");
         }
     }
 
     //if you have both, you can compare it 
     if (req.body.password && req.body.confirmedPassword) {
-        if (req.body.password != req.body.confirmedPassword) return res.status(200).send("Les mots de passes ne sont pas identiques");
+        if (req.body.password != req.body.confirmedPassword) return res.status(400).send("Les mots de passes ne sont pas identiques");
     }
 
     //Update user infos
@@ -94,7 +94,7 @@ const updateUserController = async (req, res) => {
     }
     if (req.body.usertype) {
         if (req.body.usertype != 'customer' && req.body.usertype != 'deliveryman' && req.body.usertype != 'restaurant') {
-            return res.status(200).send("Type d'utilisateur non existant");
+            return res.status(400).send("Type d'utilisateur non existant");
         }
         else {
             await User.update({ usertype: req.body.usertype }, { where: { id: userid } });
@@ -156,7 +156,7 @@ const infoUserController = async (req, res) => {
 
     //Get user info
     const dbuser = await User.findOne({ where: { id: userid } });
-    if (!dbuser) return res.status(200).send("Aucune informations sur l'utilisateur");
+    if (!dbuser) return res.status(400).send("Aucune informations sur l'utilisateur");
 
     //Checking if the email exists 
     const dbaddress = await Address.findOne({ where: { id: dbuser.addressid } });
@@ -232,7 +232,7 @@ const getRole = async (req, res) => {
             res.status(200).send('client')
         }
     } catch (err) {
-        res.status(200).send(err)
+        res.status(400).send(err)
     }
 }
 

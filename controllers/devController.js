@@ -16,13 +16,13 @@ const registerDevController = async (req, res) => {
 
     //Check if data format is OK
     const { error } = registerDevValidation(req.body);
-    if (error) return res.status(200).send(error.details[0].message)
+    if (error) return res.status(400).send(error.details[0].message)
 
     //Checking if the dev is already in the database
     const reponse = await Dev.findOne({ where: { email: req.body.email } });
-    if (reponse != null) return res.status(200).send('L\'email est déjà utilisé !');
+    if (reponse != null) return res.status(400).send('L\'email est déjà utilisé !');
 
-    if (req.body.password != req.body.confirmedPassword) return res.status(200).send("Les mots de passes ne sont pas identiques");
+    if (req.body.password != req.body.confirmedPassword) return res.status(400).send("Les mots de passes ne sont pas identiques");
 
     //Hash password
     const salt = await bcrypt.genSalt(10);
@@ -47,28 +47,28 @@ const updateDevController = async (req, res) => {
 
     //Check if data format is OK
     const { error } = updateDevValidation(req.body);
-    if (error) return res.status(200).send(error.details[0].message)
+    if (error) return res.status(400).send(error.details[0].message)
 
     //Check who is the dev
     const accesstoken = req.headers['authorization'];
     const devid = await verifTokenDevController(accesstoken)
-    if (devid == null) return res.status(200).send("Vous n'avez pas la permission d'effectuer ceci !");
+    if (devid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
 
     //if you have password or newconfirmedPassword, you have to be sur that you have the other one
     if (req.body.password) {
         if (!req.body.confirmedPassword) {
-            return res.status(200).send("Vous devez envoyer un mot de passe et le mot de passe vérifié");
+            return res.status(400).send("Vous devez envoyer un mot de passe et le mot de passe vérifié");
         }
     }
     if (req.body.confirmedPassword) {
         if (!req.body.password) {
-            return res.status(200).send("Vous devez envoyer un mot de passe et le mot de passe vérifié");
+            return res.status(400).send("Vous devez envoyer un mot de passe et le mot de passe vérifié");
         }
     }
 
     //if you have both, you can compare it 
     if (req.body.password && req.body.confirmedPassword) {
-        if (req.body.password != req.body.confirmedPassword) return res.status(200).send("Les mots de passes ne sont pas identiques");
+        if (req.body.password != req.body.confirmedPassword) return res.status(400).send("Les mots de passes ne sont pas identiques");
     }
 
     //Update dev infos
@@ -105,7 +105,7 @@ const infoDevController = async (req, res) => {
 
     //Get dev info
     const dbdev = await Dev.findOne({ where: { id: devid } });
-    if (!dbdev) return res.status(200).send("Aucune informations sur l'utilisateur");
+    if (!dbdev) return res.status(400).send("Aucune informations sur l'utilisateur");
 
     var resMessage =
         `
