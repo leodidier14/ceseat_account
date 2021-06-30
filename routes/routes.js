@@ -32,8 +32,7 @@ router.put('/user/:id', async function (req, res) {
     const tokenapp = req.headers['tokenapp'];
     checkTokenApp = await verifTokenAppController(tokenapp)
     if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
-
-    updateUserController(req, res)
+    try { updateUserController(req, res) } catch (error) { console.log(error)}
 });
 //Delete user OK
 router.delete('/user/:id', async function (req, res) {
@@ -146,9 +145,9 @@ router.put('/dev/:id', async function (req, res) {
     console.log('/dev/:id put')
     const tokenapp = req.headers['tokenapp'];
     checkTokenApp = await verifTokenAppController(tokenapp)
+    console.log(checkTokenApp)
     if (checkTokenApp == null) return res.status(200).send("La requête ne peux venir que de la gateway")
-
-    updateDevController(req, res)
+    try { updateDevController(req, res) } catch (error) { console.log(error)}
 });
 //Delete dev
 router.delete('/dev/:id', async function (req, res) {

@@ -22,7 +22,7 @@ const updateUserValidation = (data) => {
         lastName: Joi.string().min(1),
         phoneNumber: Joi.string().min(4),
         email: Joi.string().min(3).email(),
-        password: Joi.string().min(1),
+        newPassword: Joi.string().min(1),
         confirmedPassword: Joi.string().min(1),
         city: Joi.string().allow('', null),
         country: Joi.string().allow('', null),

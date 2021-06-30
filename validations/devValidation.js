@@ -18,6 +18,7 @@ const updateDevValidation = (data) => {
         email: Joi.string().min(3).required().email(),
         password: Joi.string().min(3),
         confirmedPassword: Joi.string().min(3),
+        sponsorshipLink: Joi.string().allow(null).allow('').optional(),
     });
     return schema.validate(data)
 }

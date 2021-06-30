@@ -67,30 +67,30 @@ const updateUserController = async (req, res) => {
     console.log(req.body)
 
     //if you have password or newconfirmedPassword, you have to be sur that you have the other one
-    if (req.body.password) {
+    if (req.body.newPassword) {
         if (!req.body.confirmedPassword) {
             return res.status(400).send("Vous devez envoyer un mot de passe et le mot de passe vérifié");
         }
     }
     if (req.body.confirmedPassword) {
-        if (!req.body.password) {
+        if (!req.body.newPassword) {
             return res.status(400).send("Vous devez envoyer un mot de passe et le mot de passe vérifié");
         }
     }
 
     //if you have both, you can compare it 
-    if (req.body.password && req.body.confirmedPassword) {
-        if (req.body.password != req.body.confirmedPassword) return res.status(400).send("Les mots de passes ne sont pas identiques");
+    if (req.body.newPassword && req.body.confirmedPassword) {
+        if (req.body.newPassword != req.body.confirmedPassword) return res.status(400).send("Les mots de passes ne sont pas identiques");
     }
 
     //Update user infos
     if (req.body.firstName) { await User.update({ firstName: req.body.firstName }, { where: { id: userid } }); }
     if (req.body.lastName) { await User.update({ lastName: req.body.lastName }, { where: { id: userid } }); }
     if (req.body.phoneNumber) { await User.update({ phoneNumber: req.body.phoneNumber }, { where: { id: userid } }); }
-    if (req.body.password) {
+    if (req.body.newPassword) {
         //Hash password
         const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(req.body.password, salt)
+        const hashedPassword = await bcrypt.hash(req.body.newPassword, salt)
         await User.update({ password: hashedPassword }, { where: { id: userid } });
     }
     if (req.body.usertype) {

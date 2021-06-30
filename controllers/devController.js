@@ -44,9 +44,10 @@ const registerDevController = async (req, res) => {
 
 //Modify dev
 const updateDevController = async (req, res) => {
-
+    console.log(req.body)
     //Check if data format is OK
     const { error } = updateDevValidation(req.body);
+    console.log(error)
     if (error) return res.status(400).send(error.details[0].message)
 
     //Check who is the dev
