@@ -31,8 +31,8 @@ const registerUserController = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt)
 
-    // var sponsorshipLink = null
-    // if(req.param("sponsorshipLink")){sponsorshipLink = req.param("sponsorshipLink")}
+    var sponsorshipLink = null
+    if(req.param("sponsorshipLink")){sponsorshipLink = req.param("sponsorshipLink")}
 
     //Create a new user
     const user = User.build({
@@ -42,7 +42,7 @@ const registerUserController = async (req, res) => {
         phoneNumber: req.body.phoneNumber,
         password: hashedPassword,
         userType: "customer",
-        sponsorshipLink: req.body.sponsorshipLink
+        sponsorshipLink: sponsorshipLink
     })
 
     await user.save();
@@ -61,7 +61,8 @@ const updateUserController = async (req, res) => {
     }
     //Check who is the user
     const accesstoken = req.headers['authorization'];
-    const userid = await verifTokenController(accesstoken)
+    var userid = await verifTokenController(accesstoken)
+    if(userid == null ){userid = req.params.id}
     if (userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
     console.log(req.body)
 
@@ -152,7 +153,8 @@ const infoUserController = async (req, res) => {
 
     //Check who is the user
     const accesstoken = req.headers['authorization'];
-    const userid = await verifTokenController(accesstoken)
+    var userid = await verifTokenController(accesstoken)
+    if(userid == null ){userid = req.params.id}
 
     //Get user info
     const dbuser = await User.findOne({ where: { id: userid } });
@@ -177,7 +179,7 @@ const infoUserController = async (req, res) => {
             "zipCode": null,
             "city": null,
             "country": null,
-            "sponsorshipLink": "${dbuser.dataValues.sponsorshipLink}"
+            "sponsorshipLink": "SPLCST21${dbuser.dataValues.id}"
         }
         `
     }
@@ -195,7 +197,7 @@ const infoUserController = async (req, res) => {
             "zipCode": "${dbaddress.dataValues.zipCode}",
             "city": "${dbaddress.dataValues.city}",
             "country": "${dbaddress.dataValues.country}",
-            "sponsorshipLink": "${dbuser.dataValues.sponsorshipLink}"
+            "sponsorshipLink": "SPLCST21${dbuser.dataValues.id}"
         }
         `
     }

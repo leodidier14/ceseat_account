@@ -22,12 +22,12 @@ const updateUserValidation = (data) => {
         lastName: Joi.string().min(1),
         phoneNumber: Joi.string().min(4),
         email: Joi.string().min(3).email(),
-        password: Joi.string().min(6),
-        confirmedPassword: Joi.string().min(6),
-        city: Joi.string().min(1),
-        country: Joi.string().min(1),
-        zipCode: Joi.string().min(1),
-        address: Joi.string().min(1),
+        password: Joi.string().min(1),
+        confirmedPassword: Joi.string().min(1),
+        city: Joi.string().allow('', null),
+        country: Joi.string().allow('', null),
+        zipCode: Joi.string().allow('', null),
+        address: Joi.string().allow('', null),
         id: Joi.number().min(1),
         sponsorshipLink: Joi.string()
     });
