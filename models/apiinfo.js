@@ -3,9 +3,10 @@ const { Schema } = mongoose;
 
 const apiinfo = new Schema({
     name : String,
-    port: String,
+    version : String,
     path: String,
-    version : String
+    port: Number
+
 });
 
 module.exports = mongoose.model('apiinf', apiinfo)
