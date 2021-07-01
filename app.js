@@ -7,10 +7,10 @@ const route = '/api/account/'
 require('dotenv').config({ path: path.resolve(__dirname, '.env') })
 const mongoose = require('mongoose');
 const requestLog = require('./models/requestLog')
+
 //Connect to db
-mongoose.connect(process.env.DB_MONGO_CONNECT, {useNewUrlParser: true}, () =>
-    console.log("connected to database")
-);
+mongoose.connect(process.env.DB_MONGO_CONNECT, {useNewUrlParser: true, useUnifiedTopology: true}).then().catch();
+
 //######### Display name and version ############// 
 const apiinf = require('./models/apiinfo')
 var pjson = require('./package.json');
