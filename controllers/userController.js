@@ -221,7 +221,6 @@ const infoUserController = async (req, res) => {
 };
 
 const getRole = async (req, res) => {
-    try {
 
         //Check who is the user
         const accesstoken = req.headers['authorization'];
@@ -244,10 +243,7 @@ const getRole = async (req, res) => {
         } else {
             res.status(200).send('client')
         }
-    } catch (err) {
-        console.log(err)
-        res.status(400).send(err)
-    }
+
 }
 
 const getAllUsers = async (req, res) => {

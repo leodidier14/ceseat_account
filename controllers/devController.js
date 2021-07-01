@@ -14,7 +14,7 @@ const { verifTokenDevController } = require('../controllers/tokenDevController')
 //Register dev
 const registerDevController = async (req, res) => {
 
-    try {
+
         //Check if data format is OK
         const { error } = registerDevValidation(req.body);
         if (error) return res.status(400).send(error.details[0].message)
@@ -41,14 +41,12 @@ const registerDevController = async (req, res) => {
         dbdev = await Dev.findOne({ where: { email: req.body.email } })
         //Send response 
         res.status(200).send(dbdev.dataValues)
-    } catch (error) {
-        res.status(400).send(error)
-    }  
+
 };
 
 //Modify dev
 const updateDevController = async (req, res) => {
-    try {
+
         //Check if data format is OK
         const { error } = updateDevValidation(req.body);
         if (error) return res.status(400).send(error.details[0].message)
@@ -88,27 +86,23 @@ const updateDevController = async (req, res) => {
         if (req.body.companyName) { await Dev.update({ companyName: req.body.companyName }, { where: { id: devid } }); }
 
         res.status(200).send('Modifié')
-    } catch (error) {
-        res.status(400).send(error)
-    }
+
     
 };
 
 //Delete dev 
 const deleteDevController = async (req, res) => {
-    try {
+
         const devid = req.params.id
         const deleteDev = await Dev.destroy({ where: { id: devid } });
         res.status(200).send('Supprimé')
-    } catch (error) {
-        res.status(400).send(error)
-    }
+
 
 };
 
 //Info dev
 const infoDevController = async (req, res) => {
-    try {
+
         const devid = req.params.id
 
         //Get dev info
@@ -124,9 +118,6 @@ const infoDevController = async (req, res) => {
             }
             `
         res.status(200).send(resMessage)
-    } catch (error) {
-        res.status(400).send(error)
-    }
 
 };
 

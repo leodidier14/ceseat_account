@@ -11,7 +11,7 @@ const { verifTokenController } = require('../controllers/tokenController')
 
 //Register restaurant OK
 const createRestaurantController = async (req, res) => {
-    try {
+
         //Check if data format is OK
         const { error } = createRestaurantValidation(req.body);
         if (error) return res.status(400).send(error.details[0].message)
@@ -116,16 +116,13 @@ const createRestaurantController = async (req, res) => {
 
         await User.update({ userType: "restaurateur" }, { where: { id: userid } });
         res.status(200).send(dbrestaurant)
-    } catch (error) {
-        res.status(400).send(error)
-    }
 
 };
 
 //Modify restaurant
 const updateRestaurantController = async (req, res) => {
 
-    try {
+
         //Check if data format is OK
         const { error } = updateRestaurantValidation(req.body);
         if (error) return res.status(400).send(error.details[0].message)
@@ -157,16 +154,14 @@ const updateRestaurantController = async (req, res) => {
 
         //Send response 
         res.status(200).send(`Restaurant modifié`)
-    } catch (error) {
-        res.status(400).send(error)
-    }
+
 
 };
 
 //Delete restaurant OK
 const deleteRestaurantController = async (req, res) => {
 
-    try {
+
         const accesstoken = req.headers['authorization'];
         const userid = await verifTokenController(accesstoken)
 
@@ -182,16 +177,14 @@ const deleteRestaurantController = async (req, res) => {
 
         //Send response 
         res.status(200).send(`Restaurant supprimé`)
-    } catch (error) {
-        res.status(400).send(error)
-    }
+
 
 
 };
 
 //Info restaurant OK
 const infoRestaurantController = async (req, res) => {
-    try {
+
         const accesstoken = req.headers['authorization'];
         const userid = await verifTokenController(accesstoken)
 
@@ -248,9 +241,7 @@ const infoRestaurantController = async (req, res) => {
 
 
         res.status(200).send(resMessage)
-    } catch (error) {
-        res.status(400).send(error)
-    }
+
 
 };
 

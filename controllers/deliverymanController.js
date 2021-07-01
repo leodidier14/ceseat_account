@@ -11,7 +11,6 @@ const { verifTokenController } = require('../controllers/tokenController')
 //Create deliveryman
 const createDeliverymanController = async (req, res) => {
 
-    try {
         //Check if data format is OK
         const { error } = createDeliverymanValidation(req.body);
         if (error) return res.status(400).send(error.details[0].message)
@@ -47,9 +46,7 @@ const createDeliverymanController = async (req, res) => {
         dbdeliveryman = await Deliveryman.findOne({ where: { userid: userid } });
         //Send response 
         res.status(200).send(dbdeliveryman.dataValues)
-    } catch (error) {
-        
-    }
+
     
 };
 
@@ -59,7 +56,6 @@ const updateDeliverymanController = async (req, res) => {
     const { error } = updateDeliverymanValidation(req.body);
     if (error) return res.status(400).send(error.details[0].message)
 
-    try {
         //Check who is the user
         const accesstoken = req.headers['authorization'];
         const userid = await verifTokenController(accesstoken)
@@ -73,9 +69,7 @@ const updateDeliverymanController = async (req, res) => {
 
         //return response
         res.status(200).send(`Votre compte à été mis à jour`)
-    } catch (error) {
-        res.status(400).send(error)
-    }
+
 };
 
 //Delete deliveryman
@@ -88,14 +82,12 @@ const deleteDeliverymanController = async (req, res) => {
     const dbdeliveryman = await Deliveryman.findOne({ where: { userid: userid } });
     if (dbdeliveryman == null) return res.status(400).send("Vous n'êtes pas livreur");
 
-    try {
+
         await Deliveryman.destroy({ where: { userid: userid } });
         await User.update({ userType: "customer" }, { where: { id: userid } });
 
         res.status(200).send(`Vous n'êtes plus livreur :(`)
-    } catch (error) {
-        res.status(400).send(error)
-    }
+
 };
 
 //Info deliveryman
