@@ -231,13 +231,12 @@ const getRole = async (req, res) => {
 
         const deliveryman = await Deliveryman.findOne({ where: { userid: userid } });
 
-
         /*  const dev = await dev.findOne({ where: { id: userid } });*/
         const dbtype = await User.findOne({ where: { id: userid } });
         if (restaurant) {
             res.status(200).send({ 'type': "restaurant", "id": restaurant.dataValues.id })
         } else if (deliveryman) {
-            res.status(200).send({ 'type': "deliveryman", "id": restaurant.dataValues.id })
+            res.status(200).send({ 'type': "deliveryman", "id": deliveryman.dataValues.id })
         } else if (dbtype.dataValues.userType == 'businessman') {
             res.status(200).send({ 'type': "businessman", "id": 0 })
         } else if (dbtype.dataValues.userType == 'technician') {
@@ -246,6 +245,7 @@ const getRole = async (req, res) => {
             res.status(200).send('client')
         }
     } catch (err) {
+        console.log(err)
         res.status(400).send(err)
     }
 }
