@@ -8,7 +8,7 @@ const verifTokenAppController = async (tokenapp) =>{
         if (verifytoken.id == 27062021) {return tokenContent}
         else {return null}
     } catch (error) {
-        return null 
+        return error 
      }
 }
 
