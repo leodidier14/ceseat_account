@@ -11,64 +11,71 @@ const { verifTokenController } = require('../controllers/tokenController')
 //Create deliveryman
 const createDeliverymanController = async (req, res) => {
 
-    //Check if data format is OK
-    const { error } = createDeliverymanValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message)
+    try {
+        //Check if data format is OK
+        const { error } = createDeliverymanValidation(req.body);
+        if (error) return res.status(400).send(error.details[0].message)
 
-    //Check who is the user
-    const accesstoken = req.headers['authorization'];
-    const userid = await verifTokenController(accesstoken)
-    if (userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
+        //Check who is the user
+        const accesstoken = req.headers['authorization'];
+        const userid = await verifTokenController(accesstoken)
+        if (userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
 
-    const dbuser = await User.findOne({ where: { id: userid } });
+        const dbuser = await User.findOne({ where: { id: userid } });
 
-    if (dbuser.userType == "restaurateur") return res.status(400).send("Vous êtes déjà restaurateur !");
-    if (dbuser.userType == "dev") return res.status(400).send("Vous êtes déjà développeur !");
+        if (dbuser.userType == "restaurateur") return res.status(400).send("Vous êtes déjà restaurateur !");
+        if (dbuser.userType == "dev") return res.status(400).send("Vous êtes déjà développeur !");
 
-    //Create a new restaurant
-    var dbdeliveryman = await Deliveryman.findOne({ where: { userid: userid } });
-    if (dbdeliveryman != null) return res.status(400).send("L'utilisateur est déjà livreur");
+        //Create a new restaurant
+        var dbdeliveryman = await Deliveryman.findOne({ where: { userid: userid } });
+        if (dbdeliveryman != null) return res.status(400).send("L'utilisateur est déjà livreur");
 
-    // var sponsorshipLink = null
-    // if(req.param("sponsorshipLink")){sponsorshipLink = req.param("sponsorshipLink")}
+        var sponsorshipLink = null
+        if(req.param("sponsorshipLink")){sponsorshipLink = req.param("sponsorshipLink")}
 
-    if (dbdeliveryman == null) {
-        const deliveryman = Deliveryman.build({
-            userid: userid,
-            siret: req.body.siret,
-            wallet: 0,
-            sponsorshipLink: req.body.sponsorshipLink
-        })
-        await deliveryman.save();
+        if (dbdeliveryman == null) {
+            const deliveryman = Deliveryman.build({
+                userid: userid,
+                siret: req.body.siret,
+                wallet: 0,
+                sponsorshipLink: sponsorshipLink
+            })
+            await deliveryman.save();
+        }
+
+        await User.update({ userType: "deliveryman" }, { where: { id: userid } });
+        dbdeliveryman = await Deliveryman.findOne({ where: { userid: userid } });
+        //Send response 
+        res.status(200).send(dbdeliveryman.dataValues)
+    } catch (error) {
+        
     }
-
-    await User.update({ userType: "deliveryman" }, { where: { id: userid } });
-    dbdeliveryman = await Deliveryman.findOne({ where: { userid: userid } });
-    //Send response 
-    res.status(200).send(dbdeliveryman.dataValues)
+    
 };
 
 //Modify deliveryman
 const updateDeliverymanController = async (req, res) => {
     //Check if data format is OK
     const { error } = updateDeliverymanValidation(req.body);
-    console.log(error)
     if (error) return res.status(400).send(error.details[0].message)
 
+    try {
+        //Check who is the user
+        const accesstoken = req.headers['authorization'];
+        const userid = await verifTokenController(accesstoken)
+        if (userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
 
-    //Check who is the user
-    const accesstoken = req.headers['authorization'];
-    const userid = await verifTokenController(accesstoken)
-    if (userid == null) return res.status(400).send("Vous n'avez pas la permission d'effectuer ceci !");
+        // const dbuser = await User.findOne({ where: {id: userid} });
+        var dbdeliveryman = await Deliveryman.findOne({ where: { userid: userid } });
 
-    // const dbuser = await User.findOne({ where: {id: userid} });
-    var dbdeliveryman = await Deliveryman.findOne({ where: { userid: userid } });
-    console.log(dbdeliveryman.dataValues.id)
-    //Change siret number
-    if (req.body.siret) { await Deliveryman.update({ siret: req.body.siret }, { where: { id: dbdeliveryman.id } }) }
+        //Change siret number
+        if (req.body.siret) { await Deliveryman.update({ siret: req.body.siret }, { where: { id: dbdeliveryman.id } }) }
 
-    //return response
-    res.status(200).send(`Votre compte à été mis à jour`)
+        //return response
+        res.status(200).send(`Votre compte à été mis à jour`)
+    } catch (error) {
+        res.status(400).send(error)
+    }
 };
 
 //Delete deliveryman
@@ -81,11 +88,14 @@ const deleteDeliverymanController = async (req, res) => {
     const dbdeliveryman = await Deliveryman.findOne({ where: { userid: userid } });
     if (dbdeliveryman == null) return res.status(400).send("Vous n'êtes pas livreur");
 
-    await Deliveryman.destroy({ where: { userid: userid } });
-    await User.update({ userType: "customer" }, { where: { id: userid } });
+    try {
+        await Deliveryman.destroy({ where: { userid: userid } });
+        await User.update({ userType: "customer" }, { where: { id: userid } });
 
-    //Send response 
-    res.status(200).send(`Vous n'êtes plus livreur :(`)
+        res.status(200).send(`Vous n'êtes plus livreur :(`)
+    } catch (error) {
+        res.status(400).send(error)
+    }
 };
 
 //Info deliveryman
