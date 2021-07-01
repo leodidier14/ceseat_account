@@ -270,7 +270,7 @@ module.exports.deleteUserFromApp = deleteUserFromApp;
 
 
 const changeUserRole = async (req, res) => {
-    const userid = req.body.id
+    const userid = req.params.id
     try {
         if(req.body.userType){ await User.update({ userType: req.body.userType }, { where: { id: userid } }); }
         if(req.body.isSuspended){ await User.update({ isSuspended: req.body.isSuspended }, { where: { id: userid } }); }

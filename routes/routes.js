@@ -19,7 +19,7 @@ router.delete('/app/user/:id', async function (req, res) {
     deleteUserFromApp(req, res)
 });
 
-router.put('/app/user', async function (req, res) {
+router.put('/app/user/:id', async function (req, res) {
     changeUserRole(req, res)
 });
 
