@@ -9,7 +9,9 @@ const mongoose = require('mongoose');
 const requestLog = require('./models/requestLog')
 
 //Connect to db
-mongoose.connect(process.env.DB_MONGO_CONNECT, {useNewUrlParser: true, useUnifiedTopology: true}).then().catch();
+mongoose.connect(process.env.DB_MONGO_CONNECT, {useNewUrlParser: true, useUnifiedTopology:true}, () =>
+    console.log("connected to database")
+)
 
 //######### Display name and version ############// 
 const apiinf = require('./models/apiinfo')
