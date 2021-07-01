@@ -42,7 +42,8 @@ const registerUserController = async (req, res) => {
             phoneNumber: req.body.phoneNumber,
             password: hashedPassword,
             userType: "customer",
-            sponsorshipLink: sponsorshipLink
+            sponsorshipLink: sponsorshipLink,
+            isSuspended: false
         })
 
         await user.save();
