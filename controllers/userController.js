@@ -32,7 +32,7 @@ const registerUserController = async (req, res) => {
         const hashedPassword = await bcrypt.hash(req.body.password, salt)
 
         var sponsorshipLink = null
-        if (req.param("sponsorshipLink")) { sponsorshipLink = req.param("sponsorshipLink") }
+        if (req.params.sponsorshipLink) { sponsorshipLink = req.params.sponsorshipLink}
 
         //Create a new user
         const user = User.build({
@@ -252,19 +252,19 @@ const getRole = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
     try {
-        const dbusers = await User.find();
+        const dbusers = await User.findAll();
         res.status(200).send(dbusers);
     } catch (error) {
         res.status(400).send("users cannot be find");
     }
-
 }
 module.exports.getAllUsers = getAllUsers;
+
 
 const deleteUserFromApp = async (req, res) => {
     const userid = req.params.id
     try {
-        const user = await User.find({ id: userid });
+        const user = await User.findOne({ id: userid });
         res.status(200).send("user deleted");
     } catch (error) {
         res.status(400).send("user cannot be deleted");
@@ -276,7 +276,8 @@ module.exports.deleteUserFromApp = deleteUserFromApp;
 const changeUserRole = async (req, res) => {
     const userid = req.body.id
     try {
-        await User.update({ userType: req.body.userType }, { where: { id: userid } });
+        if(req.body.userType){ await User.update({ userType: req.body.userType }, { where: { id: userid } }); }
+        if(req.body.isSuspended){ await User.update({ isSuspended: req.body.isSuspended }, { where: { id: userid } }); }
         res.status(200).send("role changed");
     } catch (error) {
         res.status(400).send("role cannot be changed");
