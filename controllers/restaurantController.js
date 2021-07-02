@@ -169,9 +169,9 @@ const deleteRestaurantController = async (req, res) => {
         const dbrestaurant = await Restaurant.findOne({ where: { userid: userid } });
         if (dbrestaurant == null) return res.status(400).send("Le restaurant n'existe pas");
 
-        try { await Restaurant.destroy({ where: { id: dbrestaurant.id } }); } catch (error) { }
+        await Restaurant.destroy({ where: { id: dbrestaurant.id } }); 
 
-        try { await Address.destroy({ where: { id: dbrestaurant.addressid } }); } catch (error) { }
+        await Address.destroy({ where: { id: dbrestaurant.addressid } }); 
 
         await User.update({ usertype: "customer" }, { where: { id: userid } });
 
